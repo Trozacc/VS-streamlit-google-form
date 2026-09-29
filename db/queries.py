@@ -7,7 +7,7 @@ import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from db.connection import get_engine
-from data.placeholder_data import SESSION_DATES, COLLEGES, STUDENTS_BY_COLLEGE
+from data.placeholder_data import SESSION_DATES
 
 
 # Table name - use the existing typo table name
@@ -71,29 +71,30 @@ def fetch_session_dates() -> list[str]:
 
 @st.cache_data(ttl=300)
 def fetch_colleges() -> list[str]:
-    """Return all college names from source table."""
+    """Return all college names from source table (Incubator 13)."""
     engine = get_engine()
     if engine is None:
-        return COLLEGES
+        return []
     try:
         query = f"""
-            SELECT DISTINCT TRIM(college_name) as college_name
+            SELECT TRIM(college_name) as college_name
             FROM {SOURCE_TABLE}
             WHERE college_name IS NOT NULL AND TRIM(college_name) <> ''
+            GROUP BY TRIM(college_name)
             ORDER BY college_name
         """
         df = pd.read_sql(query, engine)
         return df["college_name"].tolist()
     except SQLAlchemyError:
-        return COLLEGES
+        return []
 
 
 @st.cache_data(ttl=300)
 def fetch_students_by_college(college: str) -> list[dict[str, str]]:
-    """Return list of student dicts for the given college. Each dict has keys: 'name', 'stream'."""
+    """Return list of student dicts for the given college from Incubator 13."""
     engine = get_engine()
     if engine is None:
-        return STUDENTS_BY_COLLEGE.get(college, [])
+        return []
     try:
         query = f"""
             SELECT DISTINCT TRIM(full_name) as full_name, 
@@ -106,7 +107,7 @@ def fetch_students_by_college(college: str) -> list[dict[str, str]]:
         df = pd.read_sql(query, engine, params={"college": college})
         return [{"name": row["full_name"], "stream": row["stream"]} for _, row in df.iterrows()]
     except SQLAlchemyError:
-        return STUDENTS_BY_COLLEGE.get(college, [])
+        return []
 
 
 def insert_attendance_record(

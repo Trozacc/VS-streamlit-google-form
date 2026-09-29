@@ -78,32 +78,33 @@ def inject_styles():
             padding-right: 1.5rem !important;
         }
 
-        /* ============================================================
-           LOGO HEADER BACKGROUND (LIGHT GREEN)
-           ============================================================ */
+/* ============================================================
+            LOGO HEADER BACKGROUND (LIGHT GREEN)
+            ============================================================ */
         .logo-header-bg {
             background: #0077B6;
             margin: -0.75rem calc(50% - 50vw) 0 calc(50% - 50vw);
-            padding: 1rem 1.5rem;
+            padding: 0.5rem 1.5rem;
             display: flex;
             justify-content: center;
             width: 100vw;
         }
 
         /* ============================================================
-           COMPACT LOGO
-           ============================================================ */
+            COMPACT LOGO
+            ============================================================ */
         .logo-container {
             display: flex;
             justify-content: center;
             padding: 0 0 0 0;
-            margin-bottom: 2.8rem;
+            margin-bottom: 1.5rem;
         }
 
         .logo-img {
             max-width: none;
             width: auto;
-            height: 170px;
+            height: 120px;
+            border-radius: 12px;
             filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
             transition: transform 0.3s ease, filter 0.3s ease;
         }
@@ -366,16 +367,17 @@ def inject_styles():
             padding-left: 0.5rem;
         }
 
-        .student-stream {
+        .col-stream {
             color: var(--text-secondary);
             font-size: 0.8rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100%;
+            padding: 0.25rem 0.5rem;
         }
 
         /* Radio Buttons - Custom Styled for Visibility & Alignment */
@@ -414,7 +416,7 @@ def inject_styles():
             border-radius: var(--radius-sm) !important;
             padding: 0.375rem 0.875rem !important;
             font-size: 0.82rem !important;
-            font-weight: 500 !important;
+            font-weight: 700 !important;
             white-space: nowrap !important;
             display: inline-flex !important;
             align-items: center !important;
@@ -434,9 +436,9 @@ def inject_styles():
         /* Custom radio indicator (circle) */
         [data-testid="stRadio"] label[data-baseweb="radio"]::before {
             content: "" !important;
-            width: 16px !important;
-            height: 16px !important;
-            border: 3px solid #2D4A2D !important;
+            width: 20px !important;
+            height: 20px !important;
+            border: 4px solid #2D4A2D !important;
             border-radius: 50% !important;
             background: var(--bg-card) !important;
             flex-shrink: 0 !important;
@@ -455,31 +457,61 @@ def inject_styles():
             box-shadow: 0 0 0 3px rgba(105, 171, 74, 0.15) !important;
         }
 
-        /* Selected state */
-        [data-testid="stRadio"] input[type="radio"]:checked + div label[data-baseweb="radio"],
-        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"]:checked) {
-            border-color: var(--accent-green) !important;
+        /* Selected state - Present (value="Present") - GREEN #69ab4a */
+        [data-testid="stRadio"] input[type="radio"][value="Present"]:checked + div label[data-baseweb="radio"],
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"][value="Present"]:checked) {
+            border-color: #69ab4a !important;
             background: linear-gradient(135deg, rgba(105,171,74,0.12), rgba(105,171,74,0.05)) !important;
-            color: var(--accent-green-dark) !important;
+            color: #5a963f !important;
         }
 
-        [data-testid="stRadio"] input[type="radio"]:checked + div label[data-baseweb="radio"]::before,
-        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"]:checked)::before {
-            border-color: var(--accent-green) !important;
-            background: var(--accent-green) !important;
+        [data-testid="stRadio"] input[type="radio"][value="Present"]:checked + div label[data-baseweb="radio"]::before,
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"][value="Present"]:checked)::before {
+            border-color: #69ab4a !important;
+            background: #69ab4a !important;
             box-shadow: 0 0 0 3px rgba(105, 171, 74, 0.2) !important;
         }
 
-        /* Selected state inner dot */
-        [data-testid="stRadio"] input[type="radio"]:checked + div label[data-baseweb="radio"]::after,
-        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"]:checked)::after {
+        /* Selected state - Absent (value="Absent") - RED #ff0000 */
+        [data-testid="stRadio"] input[type="radio"][value="Absent"]:checked + div label[data-baseweb="radio"],
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"][value="Absent"]:checked) {
+            border-color: #ff0000 !important;
+            background: linear-gradient(135deg, rgba(255,0,0,0.12), rgba(255,0,0,0.05)) !important;
+            color: #cc0000 !important;
+        }
+
+        [data-testid="stRadio"] input[type="radio"][value="Absent"]:checked + div label[data-baseweb="radio"]::before,
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"][value="Absent"]:checked)::before {
+            border-color: #ff0000 !important;
+            background: #ff0000 !important;
+            box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2) !important;
+        }
+
+        /* Selected state inner dot - Present (white dot) */
+        [data-testid="stRadio"] input[type="radio"][value="Present"]:checked + div label[data-baseweb="radio"]::after,
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"][value="Present"]:checked)::after {
             content: "" !important;
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
-            width: 7px !important;
-            height: 7px !important;
+            width: 10px !important;
+            height: 10px !important;
+            border-radius: 50% !important;
+            background: white !important;
+            z-index: 1 !important;
+        }
+
+        /* Selected state inner dot - Absent (white dot) */
+        [data-testid="stRadio"] input[type="radio"][value="Absent"]:checked + div label[data-baseweb="radio"]::after,
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"][value="Absent"]:checked)::after {
+            content: "" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 10px !important;
+            height: 10px !important;
             border-radius: 50% !important;
             background: white !important;
             z-index: 1 !important;
@@ -534,7 +566,7 @@ def inject_styles():
 
         .stat-present .stat-value { color: #27AE60; }
         .stat-absent .stat-value { color: #E74C3C; }
-        .stat-total .stat-value { color: var(--accent-teal); }
+        .stat-total .stat-value { color: #000000; }
         .stat-unmarked .stat-value { color: #F39C12; }
 
         /* ============================================================
@@ -808,7 +840,7 @@ def inject_styles():
 
             .student-number,
             .student-name,
-            .student-stream {
+            .col-stream {
                 font-size: 0.75rem;
             }
 
