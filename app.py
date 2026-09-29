@@ -55,6 +55,11 @@ def render_section_indicator(active: int):
 def render_section_1():
     render_section_indicator(1)
 
+    # Show success message after submission
+    if st.session_state.get("show_success"):
+        st.success("✅ Attendance submitted successfully.")
+        st.session_state.show_success = False
+
     st.markdown(
         """
         <div class="form-card">
@@ -72,8 +77,7 @@ def render_section_1():
     selected_date = st.selectbox(
         "Date of the Live Session *",
         options=[""] + dates,
-        index=0 if not st.session_state.selected_date else ([""] + dates).index(st.session_state.selected_date) if st.session_state.selected_date in ([""] + dates) else 0,
-        key="date_select",
+        key="selected_date",
     )
 
     # College dropdown
@@ -81,21 +85,21 @@ def render_section_1():
     selected_college = st.selectbox(
         "Select College Name *",
         options=[""] + colleges,
-        index=0 if not st.session_state.selected_college else ([""] + colleges).index(st.session_state.selected_college) if st.session_state.selected_college in ([""] + colleges) else 0,
-        key="college_select",
+        key="selected_college",
     )
 
     # Next button
     col1, col2, col3 = st.columns([1, 1.2, 1])
     with col2:
         if st.button("Next  →", key="btn_next", use_container_width=True, type="primary"):
-            if not selected_date:
+            if not st.session_state.selected_date:
                 st.error("⚠️ Please select a session date.")
-            elif not selected_college:
+            elif not st.session_state.selected_college:
                 st.error("⚠️ Please select a college name.")
             else:
-                st.session_state.selected_date = selected_date
-                st.session_state.selected_college = selected_college
+                # Store confirmed values to survive widget unmounting
+                st.session_state.confirmed_date = st.session_state.selected_date
+                st.session_state.confirmed_college = st.session_state.selected_college
                 st.session_state.attendance = {}
                 st.session_state.current_section = 2
                 st.rerun()
@@ -107,8 +111,18 @@ def render_section_1():
 def render_section_2():
     render_section_indicator(2)
 
-    college = st.session_state.selected_college
-    session_date = st.session_state.selected_date
+    # Use confirmed values stored at Next click; fall back to widget state
+    college = st.session_state.get("confirmed_college") or st.session_state.get("selected_college", "")
+    session_date = st.session_state.get("confirmed_date") or st.session_state.get("selected_date", "")
+    
+    # Defensive: ensure college is valid
+    if not college:
+        st.error("⚠️ No college selected. Please go back and select a college.")
+        if st.button("← Back", key="btn_back_no_college", type="secondary"):
+            st.session_state.current_section = 1
+            st.rerun()
+        return
+
     students = fetch_students_by_college(college)
 
     # ── College header bar ────────────────────────────────────
@@ -142,20 +156,22 @@ def render_section_2():
         return
 
     # ── Quick actions bar ─────────────────────────────────────
-    qa_col1, qa_col2, qa_col3 = st.columns(3)
+    qa_col1, qa_col2 = st.columns(2)
     with qa_col1:
         if st.button("✅ All Present", key="btn_all_present", use_container_width=True):
             for s in students:
-                st.session_state.attendance[s["name"]] = "Present"
+                name = s["name"]
+                safe_name = "".join(c if c.isalnum() else "_" for c in name)
+                st.session_state.attendance[name] = "Present"
+                st.session_state[f"radio_{safe_name}"] = "Present"
             st.rerun()
     with qa_col2:
         if st.button("❌ All Absent", key="btn_all_absent", use_container_width=True):
             for s in students:
-                st.session_state.attendance[s["name"]] = "Absent"
-            st.rerun()
-    with qa_col3:
-        if st.button("🔄 Reset", key="btn_reset", use_container_width=True):
-            st.session_state.attendance = {}
+                name = s["name"]
+                safe_name = "".join(c if c.isalnum() else "_" for c in name)
+                st.session_state.attendance[name] = "Absent"
+                st.session_state[f"radio_{safe_name}"] = "Absent"
             st.rerun()
 
     # ── Table Column Headers ──────────────────────────────────
@@ -163,9 +179,9 @@ def render_section_2():
         """
         <div class="attendance-header-bar">
             <div>#</div>
-            <div>Student Name</div>
-            <div>Stream</div>
-            <div style="text-align:center;">Status</div>
+            <div style="text-align:left; padding-right: 4rem;">Student Name</div>
+            <div style="text-align:center; padding-right: 4rem;">Stream</div>
+            <div style="text-align:left; padding-left: 1rem;">Status</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -177,52 +193,69 @@ def render_section_2():
             name = student["name"]
             stream = student.get("stream", "—")
 
-            col_num, col_name, col_stream, col_status = st.columns([0.25, 1.15, 0.9, 1.3])
+            # Use columns with fixed pixel-like ratios for consistent spacing
+            # Ratios: # (0.15), Name (1.2), Stream (0.9), Status (1.0)
+            col_num, col_name, col_stream, col_status = st.columns([0.15, 1.2, 0.9, 1.0])
 
             with col_num:
                 st.markdown(
-                    f'<div style="padding-top:0.35rem;"><span class="student-number">{idx}</span></div>',
+                    f'<div class="student-number">{idx}</div>',
                     unsafe_allow_html=True,
                 )
 
             with col_name:
                 st.markdown(
-                    f'<div style="padding-top:0.35rem;"><span class="student-name" title="{name}">{name}</span></div>',
+                    f'<div class="student-name" title="{name}">{name}</div>',
                     unsafe_allow_html=True,
                 )
 
             with col_stream:
                 st.markdown(
-                    f'<div style="padding-top:0.35rem;"><span class="student-stream" title="{stream}">{stream}</span></div>',
+                    f'<div class="student-stream" title="{stream}">{stream}</div>',
                     unsafe_allow_html=True,
                 )
 
             with col_status:
                 current_val = st.session_state.attendance.get(name)
                 options = ["Present", "Absent"]
-                default_idx = None
-                if current_val == "Present":
-                    default_idx = 0
-                elif current_val == "Absent":
-                    default_idx = 1
+                # Use None for unselected (neutral) state
+                default_idx = 0 if current_val == "Present" else 1 if current_val == "Absent" else None
 
+                safe_name = "".join(c if c.isalnum() else "_" for c in name)
                 status = st.radio(
                     label=f"Status for {name}",
                     options=options,
                     index=default_idx,
-                    key=f"radio_{name}",
+                    key=f"radio_{safe_name}",
                     horizontal=True,
                     label_visibility="collapsed",
                 )
 
-                if status:
-                    st.session_state.attendance[name] = status
+                if status == "Present":
+                    st.session_state.attendance[name] = "Present"
+                elif status == "Absent":
+                    st.session_state.attendance[name] = "Absent"
+                elif name in st.session_state.attendance:
+                    del st.session_state.attendance[name]
 
     # ── Live summary stats ────────────────────────────────────
     total = len(students)
     present = sum(1 for s in students if st.session_state.attendance.get(s["name"]) == "Present")
     absent = sum(1 for s in students if st.session_state.attendance.get(s["name"]) == "Absent")
     unmarked = total - present - absent
+
+    # Conditional CSS for spacing when fewer than 10 students
+    if total < 10:
+        st.markdown(
+            """
+            <style>
+            .stats-row {
+                margin-top: 0.25rem !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.markdown(
         f"""
@@ -281,49 +314,16 @@ def render_section_2():
             )
 
             if success:
-                st.session_state.submitted = True
-                st.session_state.current_section = 3
+                # Show success message and redirect to home page
+                st.session_state.show_success = True
+                st.session_state.current_section = 1
+                st.session_state.selected_date = None
+                st.session_state.selected_college = None
+                st.session_state.confirmed_date = None
+                st.session_state.confirmed_college = None
+                st.session_state.attendance = {}
+                st.session_state.submitted = False
                 st.rerun()
-
-
-# ═══════════════════════════════════════════════════════════════
-# SECTION 3 — Success / Thank You
-# ═══════════════════════════════════════════════════════════════
-def render_success():
-    st.balloons()
-
-    college = st.session_state.selected_college
-    session_date = st.session_state.selected_date
-    attendance = st.session_state.attendance
-    total = len(attendance)
-    present = sum(1 for v in attendance.values() if v == "Present")
-    absent = total - present
-
-    st.markdown(
-        f"""
-        <div class="success-box">
-            <h3>🎉 Attendance Submitted Successfully!</h3>
-            <p>
-                <strong>{college}</strong><br>
-                Session: {session_date}<br><br>
-                ✅ Present: <strong>{present}</strong> &nbsp;|&nbsp;
-                ❌ Absent: <strong>{absent}</strong> &nbsp;|&nbsp;
-                📊 Total: <strong>{total}</strong>
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    col1, col2, col3 = st.columns([1, 1.2, 1])
-    with col2:
-        if st.button("📝 Submit Another", key="btn_another", use_container_width=True, type="primary"):
-            st.session_state.current_section = 1
-            st.session_state.selected_date = None
-            st.session_state.selected_college = None
-            st.session_state.attendance = {}
-            st.session_state.submitted = False
-            st.rerun()
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -335,5 +335,3 @@ if section == 1:
     render_section_1()
 elif section == 2:
     render_section_2()
-elif section == 3:
-    render_success()

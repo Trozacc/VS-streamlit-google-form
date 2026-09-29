@@ -44,15 +44,15 @@ def find_incubator_table(conn):
             WHERE table_schema = 'old' AND table_name ILIKE '%incubator%'
         """)
         old_tables = cur.fetchall()
-        
+    
     print(f"Tables in public schema matching 'incubator': {public_tables}")
     print(f"Tables in old schema matching 'incubator': {old_tables}")
     
     # Prefer public schema as user mentioned
     if public_tables:
-        return "public", public_tables[0]["table_name"]
+        return "public", f'"{public_tables[0]["table_name"]}"'
     elif old_tables:
-        return "old", old_tables[0]["table_name"]
+        return "old", f'"{old_tables[0]["table_name"]}"'
     return None, None
 
 def fetch_students(conn, schema, table_name):
@@ -67,56 +67,50 @@ def fetch_students(conn, schema, table_name):
         cur.execute(query)
         students = cur.fetchall()
     
-    print(f"\n✅ Found {len(students)} students in {schema}.{table_name}:")
+    print(f"\n[+] Found {len(students)} students in {schema}.{table_name}:")
     for student in students:
         print(f"  - {student['full_name']} ({student['stream']})")
     
     return students
 
 def create_attendance_table(conn):
-    """Create attendance table in public schema."""
+    """Create attendance table in public schema with new column structure."""
     create_sql = """
-    CREATE TABLE IF NOT EXISTS public.attendance (
-        id SERIAL PRIMARY KEY,
-        student_id VARCHAR(50),
-        student_name VARCHAR(255) NOT NULL,
-        email VARCHAR(255),
-        session_id VARCHAR(50),
-        session_name VARCHAR(255),
-        session_date DATE,
-        duration_in_sec INTEGER DEFAULT 0,
-        attendance VARCHAR(50) CHECK (attendance IN ('Present', 'Absent')),
-        source_system VARCHAR(100) DEFAULT 'Vigyan Shaala App',
-        college VARCHAR(255),
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    CREATE TABLE IF NOT EXISTS public.student_attendence (
+        "Timestamp" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        "Date_of_live_secssion" DATE,
+        "College_name" VARCHAR(255),
+        "Name_of_student" VARCHAR(255) NOT NULL,
+        "subject_area_abbrevation" VARCHAR(100),
+        "attendence_status" VARCHAR(10)
     );
     
-    CREATE INDEX IF NOT EXISTS idx_attendance_session_date ON public.attendance(session_date);
-    CREATE INDEX IF NOT EXISTS idx_attendance_student_name ON public.attendance(student_name);
-    CREATE INDEX IF NOT EXISTS idx_attendance_college ON public.attendance(college);
+    CREATE INDEX IF NOT EXISTS idx_student_attendence_session_date ON public.student_attendence("Date_of_live_secssion");
+    CREATE INDEX IF NOT EXISTS idx_student_attendence_student_name ON public.student_attendence("Name_of_student");
+    CREATE INDEX IF NOT EXISTS idx_student_attendence_college ON public.student_attendence("College_name");
     """
     
     with conn.cursor() as cur:
         cur.execute(create_sql)
     conn.commit()
-    print("\n✅ Attendance table created in public schema")
+    print("\n[+] Attendance table created in public schema with new columns")
 
 def main():
-    print("🔗 Connecting to database...")
+    print("[*] Connecting to database...")
     conn = connect_db()
     if not conn:
         sys.exit(1)
     
     try:
-        print("✅ Connected successfully!")
+        print("[+] Connected successfully!")
         
         # Find incubator table
         schema, table_name = find_incubator_table(conn)
         if not schema:
-            print("\n❌ No incubator table found in public or old schema")
+            print("\n[-] No incubator table found in public or old schema")
             sys.exit(1)
         
-        print(f"\n📋 Using table: {schema}.{table_name}")
+        print(f"\n[*] Using table: {schema}.{table_name}")
         
         # Fetch students
         students = fetch_students(conn, schema, table_name)
@@ -124,10 +118,10 @@ def main():
         # Create attendance table in public schema
         create_attendance_table(conn)
         
-        print("\n✅ Done!")
+        print("\n[+] Done!")
         
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n[-] Error: {e}")
         conn.rollback()
         sys.exit(1)
     finally:

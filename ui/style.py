@@ -30,8 +30,8 @@ def inject_styles():
             --text-primary: #1A2E1A;
             --text-secondary: #4A6E4A;
             --text-muted: #6B8E6B;
-            --accent-green: #5CED73;
-            --accent-green-dark: #45D05B;
+            --accent-green: #69ab4a;
+            --accent-green-dark: #5a963f;
             --accent-teal: #2ECC71;
             --accent-teal-dark: #27AE60;
             --accent-red: #E74C3C;
@@ -82,7 +82,7 @@ def inject_styles():
            LOGO HEADER BACKGROUND (LIGHT GREEN)
            ============================================================ */
         .logo-header-bg {
-            background: #5CED73;
+            background: #0077B6;
             margin: -0.75rem calc(50% - 50vw) 0 calc(50% - 50vw);
             padding: 1rem 1.5rem;
             display: flex;
@@ -251,15 +251,15 @@ def inject_styles():
             background: var(--bg-secondary) !important;
             border: 2px solid var(--border-dark) !important;
             border-radius: var(--radius-sm) !important;
-            padding: 0.25rem 0.75rem !important;
-            font-size: 0.8rem !important;
+            padding: 0.25rem 0.6rem !important;
+            font-size: 0.78rem !important;
             white-space: nowrap !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             margin: 0 !important;
             flex-shrink: 0 !important;
-            min-width: 70px !important;
+            min-width: 65px !important;
             transition: all 0.15s ease !important;
             cursor: pointer !important;
             color: var(--text-primary) !important;
@@ -292,14 +292,14 @@ def inject_styles():
 
         .student-count {
             background: var(--accent-green);
-            color: #1A2E1A;
+            color: #FFFFFF;
             padding: 0.25rem 0.75rem;
             border-radius: 14px;
             font-size: 0.8rem;
             font-weight: 600;
         }
 
-        /* ============================================================
+/* ============================================================
            ATTENDANCE GRID HEADER
            ============================================================ */
         .attendance-header-bar {
@@ -309,7 +309,7 @@ def inject_styles():
             border: 2px solid var(--border-dark);
             border-bottom: none;
             display: grid;
-            grid-template-columns: 0.25fr 1.15fr 0.9fr 1.3fr;
+            grid-template-columns: 50px minmax(220px, 1.2fr) minmax(280px, 0.9fr) minmax(180px, 1fr);
             gap: 0.5rem;
             font-weight: 600;
             font-size: 0.78rem;
@@ -328,10 +328,28 @@ def inject_styles():
             background: var(--bg-card) !important;
         }
 
+        /* Ensure columns in rows align with header grid */
+        [data-testid="stVerticalBlockBorderWrapper"] > div:has([data-testid="column"]) {
+            display: grid !important;
+            grid-template-columns: 50px minmax(220px, 1.2fr) minmax(280px, 0.9fr) minmax(180px, 1fr) !important;
+            gap: 0.5rem !important;
+            align-items: center !important;
+            padding: 0.5rem 0.9rem !important;
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        [data-testid="stVerticalBlockBorderWrapper"] > div:has([data-testid="column"]):last-child {
+            border-bottom: none !important;
+        }
+
         .student-number {
             color: var(--text-muted);
             font-weight: 600;
             font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
 
         .student-name {
@@ -341,6 +359,11 @@ def inject_styles():
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+            padding-left: 0.5rem;
         }
 
         .student-stream {
@@ -349,13 +372,132 @@ def inject_styles():
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        /* Status column radio button alignment */
-        [data-testid="column"]:has([data-testid="stRadio"]) {
             display: flex;
             align-items: center;
             justify-content: center;
+            height: 100%;
+        }
+
+        /* Radio Buttons - Custom Styled for Visibility & Alignment */
+        [data-testid="stRadio"] {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        [data-testid="stRadio"] > div,
+        [data-testid="stRadio"] [role="radiogroup"] {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 0.75rem !important;
+            white-space: nowrap !important;
+            width: 100% !important;
+            padding-right: 1rem !important;
+        }
+
+        /* Hide native radio input, we'll style the label */
+        [data-testid="stRadio"] input[type="radio"] {
+            position: absolute !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* Style the label as the visible radio button */
+        [data-testid="stRadio"] label[data-baseweb="radio"] {
+            background: var(--bg-card) !important;
+            border: 3px solid #2D4A2D !important;
+            border-radius: var(--radius-sm) !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.82rem !important;
+            font-weight: 500 !important;
+            white-space: nowrap !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.375rem !important;
+            margin: 0 !important;
+            flex-shrink: 0 !important;
+            min-width: 84px !important;
+            min-height: 38px !important;
+            transition: all 0.18s ease !important;
+            cursor: pointer !important;
+            color: var(--text-primary) !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+            position: relative !important;
+        }
+
+        /* Custom radio indicator (circle) */
+        [data-testid="stRadio"] label[data-baseweb="radio"]::before {
+            content: "" !important;
+            width: 16px !important;
+            height: 16px !important;
+            border: 3px solid #2D4A2D !important;
+            border-radius: 50% !important;
+            background: var(--bg-card) !important;
+            flex-shrink: 0 !important;
+            transition: all 0.18s ease !important;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05) !important;
+        }
+
+        /* Hover state */
+        [data-testid="stRadio"] label[data-baseweb="radio"]:hover {
+            border-color: var(--accent-green) !important;
+            background: var(--bg-card-hover) !important;
+        }
+
+        [data-testid="stRadio"] label[data-baseweb="radio"]:hover::before {
+            border-color: var(--accent-green) !important;
+            box-shadow: 0 0 0 3px rgba(105, 171, 74, 0.15) !important;
+        }
+
+        /* Selected state */
+        [data-testid="stRadio"] input[type="radio"]:checked + div label[data-baseweb="radio"],
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"]:checked) {
+            border-color: var(--accent-green) !important;
+            background: linear-gradient(135deg, rgba(105,171,74,0.12), rgba(105,171,74,0.05)) !important;
+            color: var(--accent-green-dark) !important;
+        }
+
+        [data-testid="stRadio"] input[type="radio"]:checked + div label[data-baseweb="radio"]::before,
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"]:checked)::before {
+            border-color: var(--accent-green) !important;
+            background: var(--accent-green) !important;
+            box-shadow: 0 0 0 3px rgba(105, 171, 74, 0.2) !important;
+        }
+
+        /* Selected state inner dot */
+        [data-testid="stRadio"] input[type="radio"]:checked + div label[data-baseweb="radio"]::after,
+        [data-testid="stRadio"] label[data-baseweb="radio"]:has(input[type="radio"]:checked)::after {
+            content: "" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 7px !important;
+            height: 7px !important;
+            border-radius: 50% !important;
+            background: white !important;
+            z-index: 1 !important;
+        }
+
+        /* Focus visible for accessibility */
+        [data-testid="stRadio"] input[type="radio"]:focus-visible + div label[data-baseweb="radio"],
+        [data-testid="stRadio"] label[data-baseweb="radio"]:focus-within {
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(105, 171, 74, 0.3) !important;
+            border-color: var(--accent-green) !important;
+        }
+
+        /* Ensure label text is visible and doesn't wrap */
+        [data-testid="stRadio"] label[data-baseweb="radio"] > div:last-child,
+        [data-testid="stRadio"] label[data-baseweb="radio"] span {
+            white-space: nowrap !important;
+            overflow: visible !important;
         }
 
         /* ============================================================
@@ -412,8 +554,8 @@ def inject_styles():
         .stButton > button[kind="primary"],
         div[data-testid="stForm"] .stButton > button {
             background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)) !important;
-            color: #1A2E1A !important;
-            box-shadow: 0 2px 8px rgba(92,237,115,0.3) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 2px 8px rgba(105,171,74,0.3) !important;
         }
 
         .stButton > button[kind="primary"]:hover {
@@ -510,10 +652,9 @@ def inject_styles():
                 font-size: 0.8rem !important;
             }
 
-            .attendance-header-bar {
-                grid-template-columns: 0.3fr 1.2fr 1fr 1.5fr;
-                font-size: 0.7rem;
-                padding: 0.5rem 0.6rem;
+            .attendance-header-row,
+            .attendance-row {
+                grid-template-columns: 50px minmax(200px, 1fr) minmax(250px, 1fr) 160px;
             }
 
             .form-card {
@@ -573,68 +714,42 @@ def inject_styles():
                 padding: 0.2rem 0.6rem;
             }
 
-            .attendance-header-bar {
-                display: none;
+            .attendance-header-row,
+            .attendance-row {
+                grid-template-columns: 45px minmax(180px, 1fr) minmax(200px, 1fr) 150px;
             }
 
-            [data-testid="column"] {
-                padding: 0 !important;
+            .attendance-col {
+                padding: 0 0.35rem;
             }
 
-            .student-number,
-            .student-name,
-            .student-stream {
-                font-size: 0.8rem;
+            .attendance-col-name {
+                font-size: 0.82rem;
             }
 
-            [data-testid="stRadio"] > div,
-            [data-testid="stRadio"] [role="radiogroup"] {
-                gap: 0.3rem !important;
+            .attendance-col-stream {
+                font-size: 0.75rem;
             }
 
-            [data-testid="stRadio"] label[data-baseweb="radio"] {
-                padding: 0.3rem 0.5rem !important;
-                font-size: 0.75rem !important;
-                min-width: 60px !important;
+            .attendance-radio-label {
+                padding: 0.25rem 0.4rem;
+                font-size: 0.72rem;
+                min-width: 55px;
             }
 
-            .stats-row {
-                flex-wrap: wrap;
-                gap: 0.4rem;
+            .attendance-radio-input {
+                width: 12px;
+                height: 12px;
             }
 
-            .stat-card {
-                flex: 1 1 calc(50% - 0.2rem);
-                min-width: 120px;
-                padding: 0.5rem 0.4rem;
+            [data-testid="stSelectbox"] > div > div {
+                min-height: 44px !important;
+                font-size: 0.95rem !important;
             }
 
-            .stat-value {
-                font-size: 1rem;
-            }
-
-            .stat-label {
-                font-size: 0.65rem;
-            }
-
-            .stButton > button {
+            [data-testid="stSelectbox"] label {
                 font-size: 0.85rem !important;
-                padding: 0.55rem 1rem !important;
-                min-height: 42px !important;
             }
-
-            .success-box {
-                padding: 1.2rem;
-            }
-
-            .success-box h3 {
-                font-size: 1.1rem;
-            }
-
-            .success-box p {
-                font-size: 0.85rem;
-            }
-        }
 
         /* Mobile Landscape (480px and below) */
         @media (max-width: 480px) {
@@ -707,6 +822,98 @@ def inject_styles():
                 min-width: 55px !important;
             }
 
+            /* Mobile Landscape (480px and below) */
+        @media (max-width: 480px) {
+            .block-container {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+                padding-bottom: 2rem !important;
+            }
+
+            .logo-header-bg {
+                margin: -0.5rem calc(50% - 50vw) 0 calc(50% - 50vw) !important;
+                padding: 0.6rem 0.75rem;
+            }
+
+            .logo-img {
+                height: 110px;
+            }
+
+            .form-title {
+                font-size: 1rem !important;
+            }
+
+            .form-subtitle {
+                font-size: 0.7rem !important;
+            }
+
+            .logo-container {
+                margin-bottom: 1rem;
+            }
+
+            .form-card {
+                padding: 1rem 0.8rem;
+                border-radius: var(--radius-sm);
+            }
+
+            .form-card-header {
+                font-size: 0.95rem;
+            }
+
+            .form-card-description {
+                font-size: 0.78rem;
+            }
+
+            [data-testid="stSelectbox"] > div > div {
+                min-height: 44px !important;
+                font-size: 0.9rem !important;
+            }
+
+            .college-header {
+                padding: 0.6rem 0.75rem;
+            }
+
+            .college-name {
+                font-size: 0.9rem;
+            }
+
+            .attendance-header-row,
+            .attendance-row {
+                grid-template-columns: 40px minmax(150px, 1fr) minmax(180px, 1fr) 140px;
+            }
+
+            .attendance-col {
+                padding: 0 0.25rem;
+            }
+
+            .attendance-col-name {
+                font-size: 0.78rem;
+            }
+
+            .attendance-col-stream {
+                font-size: 0.7rem;
+            }
+
+            .attendance-radio-label {
+                padding: 0.2rem 0.3rem;
+                font-size: 0.68rem;
+                min-width: 50px;
+            }
+
+            .attendance-radio-input {
+                width: 11px;
+                height: 11px;
+            }
+
+            .attendance-radio-text {
+                font-size: 0.68rem;
+            }
+
+            [data-testid="stSelectbox"] > div > div {
+                min-height: 44px !important;
+                font-size: 0.9rem !important;
+            }
+
             .stats-row {
                 gap: 0.3rem;
             }
@@ -744,6 +951,34 @@ def inject_styles():
 
             .logo-container {
                 margin-bottom: 0.75rem;
+            }
+
+            .attendance-header-row,
+            .attendance-row {
+                grid-template-columns: 35px minmax(120px, 1fr) minmax(150px, 1fr) 120px;
+            }
+
+            .attendance-col-name {
+                font-size: 0.7rem;
+            }
+
+            .attendance-col-stream {
+                font-size: 0.65rem;
+            }
+
+            .attendance-radio-label {
+                padding: 0.15rem 0.25rem;
+                font-size: 0.6rem;
+                min-width: 45px;
+            }
+
+            .attendance-radio-input {
+                width: 10px;
+                height: 10px;
+            }
+
+            .attendance-radio-text {
+                font-size: 0.6rem;
             }
         }
 

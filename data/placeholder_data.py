@@ -84,57 +84,290 @@ COLLEGES = [
 # Format:  { "college_name": [ {"name": "Student Name", "stream": "Stream"}, ... ] }
 # ──────────────────────────────────────────────────────────────
 STUDENTS_BY_COLLEGE: dict[str, list[dict[str, str]]] = {
-    # ── sample data for demonstration ──────────────────────────
-    "Acharya Narendra Dev College": [
-        {"name": "Aarav Sharma", "stream": "B.Sc. (Hons) Physics"},
-        {"name": "Priya Gupta", "stream": "B.Sc. (Hons) Chemistry"},
-        {"name": "Rohan Mehta", "stream": "B.Sc. (Hons) Mathematics"},
-        {"name": "Sneha Verma", "stream": "B.Sc. (Hons) Zoology"},
-        {"name": "Vikram Singh", "stream": "B.Sc. (Hons) Botany"},
+    # MJPTBC colleges
+    "MJPTBC Adilabad": [
+        {"name": "Aarav Sharma", "stream": "B.Sc. Physics"},
+        {"name": "Priya Gupta", "stream": "B.Sc. Chemistry"},
+        {"name": "Rohan Mehta", "stream": "B.Sc. Mathematics"},
     ],
-    "Aditi Mahavidyalaya": [
-        {"name": "Ananya Joshi", "stream": "B.A. (Hons) Hindi"},
-        {"name": "Kavya Reddy", "stream": "B.Com. (Hons)"},
-        {"name": "Manish Tiwari", "stream": "B.Sc. (Hons) Computer Science"},
+    "MJPTBC Ghanpur": [
+        {"name": "Ananya Reddy", "stream": "B.Sc. Zoology"},
+        {"name": "Kavya Singh", "stream": "B.Sc. Botany"},
+        {"name": "Manish Kumar", "stream": "B.Sc. Computer Science"},
     ],
-    "Miranda House": [
-        {"name": "Diya Kapoor", "stream": "B.A. (Hons) English"},
-        {"name": "Fatima Khan", "stream": "B.Sc. (Hons) Physics"},
-        {"name": "Ishita Nair", "stream": "B.A. (Hons) History"},
-        {"name": "Meera Patel", "stream": "B.Sc. (Hons) Chemistry"},
-        {"name": "Nandini Rao", "stream": "B.A. (Hons) Political Science"},
-        {"name": "Rhea Banerjee", "stream": "B.Sc. (Hons) Mathematics"},
+    "MJPTBC Hyderabad_Keesara": [
+        {"name": "Diya Nair", "stream": "B.Sc. Physics"},
+        {"name": "Fatima Khan", "stream": "B.Sc. Chemistry"},
+        {"name": "Ishita Patel", "stream": "B.Sc. Mathematics"},
     ],
-    "Hans Raj College": [
-        {"name": "Aditya Kumar", "stream": "B.Sc. (Hons) Physics"},
-        {"name": "Dev Chauhan", "stream": "B.Com. (Hons)"},
-        {"name": "Harsh Pandey", "stream": "B.A. (Hons) Economics"},
-        {"name": "Nikhil Saxena", "stream": "B.Sc. (Hons) Chemistry"},
+    "MJPTBC Jogulamba Gadwal": [
+        {"name": "Meera Sharma", "stream": "B.Sc. Zoology"},
+        {"name": "Nandini Rao", "stream": "B.Sc. Botany"},
+        {"name": "Rhea Banerjee", "stream": "B.Sc. Biotechnology"},
     ],
-    "Hindu College": [
-        {"name": "Arjun Malhotra", "stream": "B.A. (Hons) English"},
-        {"name": "Kabir Dhawan", "stream": "B.Sc. (Hons) Physics"},
-        {"name": "Lakshmi Iyer", "stream": "B.Com. (Hons)"},
-        {"name": "Sanya Arora", "stream": "B.A. (Hons) Philosophy"},
-        {"name": "Tanvi Bhatia", "stream": "B.Sc. (Hons) Statistics"},
+    "MJPTBC Kamareddy": [
+        {"name": "Arjun Malhotra", "stream": "B.Sc. Physics"},
+        {"name": "Dev Chauhan", "stream": "B.Sc. Chemistry"},
+        {"name": "Harsh Pandey", "stream": "B.Sc. Mathematics"},
     ],
-    "Gargi College": [
-        {"name": "Aditi Choudhary", "stream": "B.A. (Hons) Psychology"},
-        {"name": "Bhavna Mishra", "stream": "B.Sc. (Hons) Microbiology"},
-        {"name": "Charvi Aggarwal", "stream": "B.Com. (Hons)"},
-        {"name": "Deepika Yadav", "stream": "B.A. (Hons) Political Science"},
+    "MJPTBC Khammam": [
+        {"name": "Kabir Dhawan", "stream": "B.Sc. Zoology"},
+        {"name": "Lakshmi Iyer", "stream": "B.Sc. Botany"},
+        {"name": "Sanya Arora", "stream": "B.Sc. Computer Science"},
     ],
-    "Ramjas College": [
-        {"name": "Arnav Srivastava", "stream": "B.Sc. (Hons) Mathematics"},
-        {"name": "Gaurav Thakur", "stream": "B.A. (Hons) History"},
-        {"name": "Kunal Jain", "stream": "B.Com. (Hons)"},
+    "MJPTBC Mahabubabad": [
+        {"name": "Tanvi Bhatia", "stream": "B.Sc. Physics"},
+        {"name": "Aditi Choudhary", "stream": "B.Sc. Chemistry"},
+        {"name": "Bhavna Mishra", "stream": "B.Sc. Mathematics"},
     ],
-    "Lady Shri Ram College for Women": [
-        {"name": "Aisha Siddiqui", "stream": "B.A. (Hons) Economics"},
-        {"name": "Divya Menon", "stream": "B.A. (Hons) Journalism"},
-        {"name": "Kriti Sharma", "stream": "B.A. (Hons) Psychology"},
-        {"name": "Pooja Rathi", "stream": "B.Com. (Hons)"},
-        {"name": "Saumya Kulkarni", "stream": "B.A. (Hons) English"},
+    "MJPTBC Medhcal_Keesara": [
+        {"name": "Charvi Aggarwal", "stream": "B.Sc. Zoology"},
+        {"name": "Deepika Yadav", "stream": "B.Sc. Botany"},
+        {"name": "Arnav Srivastava", "stream": "B.Sc. Biotechnology"},
+    ],
+    "MJPTBC Mulugu": [
+        {"name": "Gaurav Thakur", "stream": "B.Sc. Physics"},
+        {"name": "Kunal Jain", "stream": "B.Sc. Chemistry"},
+        {"name": "Aisha Siddiqui", "stream": "B.Sc. Mathematics"},
+    ],
+    "MJPTBC Nizamabad": [
+        {"name": "Divya Menon", "stream": "B.Sc. Zoology"},
+        {"name": "Kriti Sharma", "stream": "B.Sc. Botany"},
+        {"name": "Pooja Rathi", "stream": "B.Sc. Computer Science"},
+    ],
+    "MJPTBC Pedapalli": [
+        {"name": "Saumya Kulkarni", "stream": "B.Sc. Physics"},
+        {"name": "Aditya Kumar", "stream": "B.Sc. Chemistry"},
+        {"name": "Priya Verma", "stream": "B.Sc. Mathematics"},
+    ],
+    "MJPTBC Sangareddy": [
+        {"name": "Rohan Gupta", "stream": "B.Sc. Zoology"},
+        {"name": "Sneha Patel", "stream": "B.Sc. Botany"},
+        {"name": "Vikram Singh", "stream": "B.Sc. Biotechnology"},
+    ],
+    "MJPTBC Suryapet": [
+        {"name": "Ananya Joshi", "stream": "B.Sc. Physics"},
+        {"name": "Kavya Reddy", "stream": "B.Sc. Chemistry"},
+        {"name": "Manish Tiwari", "stream": "B.Sc. Mathematics"},
+    ],
+    "MJPTBC Wargal": [
+        {"name": "Diya Kapoor", "stream": "B.Sc. Zoology"},
+        {"name": "Fatima Khan", "stream": "B.Sc. Botany"},
+        {"name": "Ishita Nair", "stream": "B.Sc. Computer Science"},
+    ],
+    # TSWRD
+    "TSWRD Pharmacy College, Mahbubabad": [
+        {"name": "Meera Patel", "stream": "B.Pharm"},
+        {"name": "Nandini Rao", "stream": "B.Pharm"},
+        {"name": "Rhea Banerjee", "stream": "B.Pharm"},
+    ],
+    # TSWRDC
+    "TSWRDC & PGC, Budvel": [
+        {"name": "Arjun Malhotra", "stream": "B.Sc. Physics"},
+        {"name": "Dev Chauhan", "stream": "B.Sc. Chemistry"},
+        {"name": "Harsh Pandey", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDC Khammam": [
+        {"name": "Kabir Dhawan", "stream": "B.Sc. Zoology"},
+        {"name": "Lakshmi Iyer", "stream": "B.Sc. Botany"},
+        {"name": "Sanya Arora", "stream": "B.Sc. Computer Science"},
+    ],
+    "TSWRDC Mahendrahills": [
+        {"name": "Tanvi Bhatia", "stream": "B.Sc. Physics"},
+        {"name": "Aditi Choudhary", "stream": "B.Sc. Chemistry"},
+        {"name": "Bhavna Mishra", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDC Nirmal": [
+        {"name": "Charvi Aggarwal", "stream": "B.Sc. Zoology"},
+        {"name": "Deepika Yadav", "stream": "B.Sc. Botany"},
+        {"name": "Arnav Srivastava", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TSWRDC Nizamabad": [
+        {"name": "Gaurav Thakur", "stream": "B.Sc. Physics"},
+        {"name": "Kunal Jain", "stream": "B.Sc. Chemistry"},
+        {"name": "Aisha Siddiqui", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDC Siddipet": [
+        {"name": "Divya Menon", "stream": "B.Sc. Zoology"},
+        {"name": "Kriti Sharma", "stream": "B.Sc. Botany"},
+        {"name": "Pooja Rathi", "stream": "B.Sc. Computer Science"},
+    ],
+    # TSWRDCW
+    "TSWRDCW Adilabad": [
+        {"name": "Saumya Kulkarni", "stream": "B.Sc. Physics"},
+        {"name": "Aditya Kumar", "stream": "B.Sc. Chemistry"},
+        {"name": "Priya Verma", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Armoor": [
+        {"name": "Rohan Gupta", "stream": "B.Sc. Zoology"},
+        {"name": "Sneha Patel", "stream": "B.Sc. Botany"},
+        {"name": "Vikram Singh", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TSWRDCW Bhongir": [
+        {"name": "Ananya Joshi", "stream": "B.Sc. Physics"},
+        {"name": "Kavya Reddy", "stream": "B.Sc. Chemistry"},
+        {"name": "Manish Tiwari", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Bhupalpally": [
+        {"name": "Diya Kapoor", "stream": "B.Sc. Zoology"},
+        {"name": "Fatima Khan", "stream": "B.Sc. Botany"},
+        {"name": "Ishita Nair", "stream": "B.Sc. Computer Science"},
+    ],
+    "TSWRDCW Jagathgirigutta": [
+        {"name": "Meera Patel", "stream": "B.Sc. Physics"},
+        {"name": "Nandini Rao", "stream": "B.Sc. Chemistry"},
+        {"name": "Rhea Banerjee", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Jagtial": [
+        {"name": "Arjun Malhotra", "stream": "B.Sc. Zoology"},
+        {"name": "Dev Chauhan", "stream": "B.Sc. Botany"},
+        {"name": "Harsh Pandey", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TSWRDCW Kamareddy": [
+        {"name": "Kabir Dhawan", "stream": "B.Sc. Physics"},
+        {"name": "Lakshmi Iyer", "stream": "B.Sc. Chemistry"},
+        {"name": "Sanya Arora", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Karimnagar": [
+        {"name": "Tanvi Bhatia", "stream": "B.Sc. Zoology"},
+        {"name": "Aditi Choudhary", "stream": "B.Sc. Botany"},
+        {"name": "Bhavna Mishra", "stream": "B.Sc. Computer Science"},
+    ],
+    "TSWRDCW Kothagudem": [
+        {"name": "Charvi Aggarwal", "stream": "B.Sc. Physics"},
+        {"name": "Deepika Yadav", "stream": "B.Sc. Chemistry"},
+        {"name": "Arnav Srivastava", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Mahbubnagar": [
+        {"name": "Gaurav Thakur", "stream": "B.Sc. Zoology"},
+        {"name": "Kunal Jain", "stream": "B.Sc. Botany"},
+        {"name": "Aisha Siddiqui", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TSWRDCW Mancherial": [
+        {"name": "Divya Menon", "stream": "B.Sc. Physics"},
+        {"name": "Kriti Sharma", "stream": "B.Sc. Chemistry"},
+        {"name": "Pooja Rathi", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Medak": [
+        {"name": "Saumya Kulkarni", "stream": "B.Sc. Zoology"},
+        {"name": "Aditya Kumar", "stream": "B.Sc. Botany"},
+        {"name": "Priya Verma", "stream": "B.Sc. Computer Science"},
+    ],
+    "TSWRDCW Nagarkurnool": [
+        {"name": "Rohan Gupta", "stream": "B.Sc. Physics"},
+        {"name": "Sneha Patel", "stream": "B.Sc. Chemistry"},
+        {"name": "Vikram Singh", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Nalgonda": [
+        {"name": "Ananya Joshi", "stream": "B.Sc. Zoology"},
+        {"name": "Kavya Reddy", "stream": "B.Sc. Botany"},
+        {"name": "Manish Tiwari", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TSWRDCW Sircilla": [
+        {"name": "Diya Kapoor", "stream": "B.Sc. Physics"},
+        {"name": "Fatima Khan", "stream": "B.Sc. Chemistry"},
+        {"name": "Ishita Nair", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Suryapet": [
+        {"name": "Meera Patel", "stream": "B.Sc. Zoology"},
+        {"name": "Nandini Rao", "stream": "B.Sc. Botany"},
+        {"name": "Rhea Banerjee", "stream": "B.Sc. Computer Science"},
+    ],
+    "TSWRDCW Vikarabad": [
+        {"name": "Arjun Malhotra", "stream": "B.Sc. Physics"},
+        {"name": "Dev Chauhan", "stream": "B.Sc. Chemistry"},
+        {"name": "Harsh Pandey", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Wanaparthy": [
+        {"name": "Kabir Dhawan", "stream": "B.Sc. Zoology"},
+        {"name": "Lakshmi Iyer", "stream": "B.Sc. Botany"},
+        {"name": "Sanya Arora", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TSWRDCW Warangal east": [
+        {"name": "Tanvi Bhatia", "stream": "B.Sc. Physics"},
+        {"name": "Aditi Choudhary", "stream": "B.Sc. Chemistry"},
+        {"name": "Bhavna Mishra", "stream": "B.Sc. Mathematics"},
+    ],
+    "TSWRDCW Warangal West": [
+        {"name": "Charvi Aggarwal", "stream": "B.Sc. Zoology"},
+        {"name": "Deepika Yadav", "stream": "B.Sc. Botany"},
+        {"name": "Arnav Srivastava", "stream": "B.Sc. Computer Science"},
+    ],
+    # TTWRDC
+    "TTWRDC Asifabad": [
+        {"name": "Gaurav Thakur", "stream": "B.Sc. Physics"},
+        {"name": "Kunal Jain", "stream": "B.Sc. Chemistry"},
+        {"name": "Aisha Siddiqui", "stream": "B.Sc. Mathematics"},
+    ],
+    "TTWRDC Dammapeta": [
+        {"name": "Divya Menon", "stream": "B.Sc. Zoology"},
+        {"name": "Kriti Sharma", "stream": "B.Sc. Botany"},
+        {"name": "Pooja Rathi", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TTWRDC Devarakonda": [
+        {"name": "Saumya Kulkarni", "stream": "B.Sc. Physics"},
+        {"name": "Aditya Kumar", "stream": "B.Sc. Chemistry"},
+        {"name": "Priya Verma", "stream": "B.Sc. Mathematics"},
+    ],
+    "TTWRDC Janagaon": [
+        {"name": "Rohan Gupta", "stream": "B.Sc. Zoology"},
+        {"name": "Sneha Patel", "stream": "B.Sc. Botany"},
+        {"name": "Vikram Singh", "stream": "B.Sc. Computer Science"},
+    ],
+    "TTWRDC Khammam": [
+        {"name": "Ananya Joshi", "stream": "B.Sc. Physics"},
+        {"name": "Kavya Reddy", "stream": "B.Sc. Chemistry"},
+        {"name": "Manish Tiwari", "stream": "B.Sc. Mathematics"},
+    ],
+    "TTWRDC Kothagudem": [
+        {"name": "Diya Kapoor", "stream": "B.Sc. Zoology"},
+        {"name": "Fatima Khan", "stream": "B.Sc. Botany"},
+        {"name": "Ishita Nair", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TTWRDC Mahabubabad": [
+        {"name": "Meera Patel", "stream": "B.Sc. Physics"},
+        {"name": "Nandini Rao", "stream": "B.Sc. Chemistry"},
+        {"name": "Rhea Banerjee", "stream": "B.Sc. Mathematics"},
+    ],
+    "TTWRDC Mahabubnagar": [
+        {"name": "Arjun Malhotra", "stream": "B.Sc. Zoology"},
+        {"name": "Dev Chauhan", "stream": "B.Sc. Botany"},
+        {"name": "Harsh Pandey", "stream": "B.Sc. Computer Science"},
+    ],
+    "TTWRDC Medak": [
+        {"name": "Kabir Dhawan", "stream": "B.Sc. Physics"},
+        {"name": "Lakshmi Iyer", "stream": "B.Sc. Chemistry"},
+        {"name": "Sanya Arora", "stream": "B.Sc. Mathematics"},
+    ],
+    "TTWRDC Mulugu": [
+        {"name": "Tanvi Bhatia", "stream": "B.Sc. Zoology"},
+        {"name": "Aditi Choudhary", "stream": "B.Sc. Botany"},
+        {"name": "Bhavna Mishra", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TTWRDC Nizamabad": [
+        {"name": "Charvi Aggarwal", "stream": "B.Sc. Physics"},
+        {"name": "Deepika Yadav", "stream": "B.Sc. Chemistry"},
+        {"name": "Arnav Srivastava", "stream": "B.Sc. Mathematics"},
+    ],
+    "TTWRDC Shadnagar": [
+        {"name": "Gaurav Thakur", "stream": "B.Sc. Zoology"},
+        {"name": "Kunal Jain", "stream": "B.Sc. Botany"},
+        {"name": "Aisha Siddiqui", "stream": "B.Sc. Computer Science"},
+    ],
+    "TTWRDC Sircilla": [
+        {"name": "Divya Menon", "stream": "B.Sc. Physics"},
+        {"name": "Kriti Sharma", "stream": "B.Sc. Chemistry"},
+        {"name": "Pooja Rathi", "stream": "B.Sc. Mathematics"},
+    ],
+    "TTWRDC Suryapeta": [
+        {"name": "Saumya Kulkarni", "stream": "B.Sc. Zoology"},
+        {"name": "Aditya Kumar", "stream": "B.Sc. Botany"},
+        {"name": "Priya Verma", "stream": "B.Sc. Biotechnology"},
+    ],
+    "TTWRDC Utnoor": [
+        {"name": "Rohan Gupta", "stream": "B.Sc. Physics"},
+        {"name": "Sneha Patel", "stream": "B.Sc. Chemistry"},
+        {"name": "Vikram Singh", "stream": "B.Sc. Mathematics"},
     ],
 }
 

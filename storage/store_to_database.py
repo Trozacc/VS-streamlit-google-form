@@ -2,10 +2,31 @@
 Storage module — writes attendance records to PostgreSQL.
 """
 
-import pandas as pd
 import streamlit as st
+from datetime import datetime
 from db.connection import get_engine
+from db.queries import _ensure_attendance_schema, ATTENDANCE_TABLE
 from utils.helper_functions import get_ist_timestamp
+
+
+def _parse_session_date(date_str: str) -> str:
+    """Parse various date string formats and return YYYY-MM-DD string."""
+    if not date_str:
+        return datetime.now().strftime("%Y-%m-%d")
+    # Try common formats
+    formats = [
+        "%d %B, %Y",      # "10 September, 2026"
+        "%Y-%m-%d",       # "2026-09-10"
+        "%d/%m/%Y",       # "10/09/2026"
+        "%d-%m-%Y",       # "10-09-2026"
+    ]
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str.strip(), fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    # Fallback: return as-is (let DB handle or raise)
+    return date_str
 
 
 def store_attendance(
@@ -14,60 +35,47 @@ def store_attendance(
     attendance_records: list[dict],
 ) -> bool:
     """
-    Store attendance records to the PostgreSQL database using pandas to_sql.
-
-    Parameters
-    ----------
-    session_date : str
-        The date of the live session.
-    college : str
-        The college name.
-    attendance_records : list[dict]
-        List of dicts with keys: 'name', 'stream', 'status' (Present/Absent).
-
-    Returns
-    -------
-    bool
-        True if storage succeeded, False otherwise.
+    Store attendance records to the PostgreSQL database (batch insert).
     """
     try:
-        timestamp = get_ist_timestamp()
+        # Ensure schema exists (migration)
+        if not _ensure_attendance_schema():
+            raise RuntimeError("Database schema not ready")
 
-        rows = []
-        for record in attendance_records:
-            student_name = record["name"]
-            student_id = student_name.lower().replace(" ", "_")
-            session_id = f"{college}_{session_date}".replace(" ", "_").replace(",", "")
-            session_name = f"Live Session {session_date}"
-            
-            rows.append({
-                "student_id": student_id,
-                "student_name": student_name,
-                "email": "",
-                "session_id": session_id,
-                "session_name": session_name,
-                "session_date": session_date,
-                "duration_in_sec": 0,
-                "attendance": record["status"],
-                "source_system": "Vigyan Shaala App",
-                "timestamp": timestamp,
-                "college": college,
-            })
-
-        df = pd.DataFrame(rows)
+        parsed_date = _parse_session_date(session_date)
         engine = get_engine()
-        
         if engine is None:
             raise RuntimeError("Database engine not available")
 
-        df.to_sql(
-            "student_attendence",
-            engine,
-            schema="old",
-            if_exists="append",
-            index=False,
-            method="multi"
+        timestamp = get_ist_timestamp()
+
+        # Build all rows for batch insert
+        rows = []
+        for record in attendance_records:
+            student_name = record["name"]
+            stream = record.get("stream", "NA")
+            status = record["status"]
+
+            rows.append({
+                "timestamp": timestamp,
+                "date_of_live_session": parsed_date,
+                "college_name": college,
+                "name_of_student": student_name,
+                "subject_area_abbrevation": stream,
+                "attendence_status": status
+            })
+
+        # Batch insert in single transaction
+        from sqlalchemy import text
+        sql = f"""
+        INSERT INTO {ATTENDANCE_TABLE} (
+            "Timestamp", "Date_of_live_secssion", "College_name", "Name_of_student", "subject_area_abbrevation", "attendence_status"
+        ) VALUES (
+            :timestamp, :date_of_live_session, :college_name, :name_of_student, :subject_area_abbrevation, :attendence_status
         )
+        """
+        with engine.begin() as conn:
+            conn.execute(text(sql), rows)
 
         return True
 

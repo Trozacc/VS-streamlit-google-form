@@ -13,14 +13,16 @@ def get_engine() -> Engine:
     """
     Create and cache a SQLAlchemy engine using credentials from st.secrets.
 
-    Expected keys in .streamlit/secrets.toml:
+    Expected keys in .streamlit/secrets.toml under [db] section:
         DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
     """
     try:
+        from urllib.parse import quote_plus
+        password = quote_plus(st.secrets['db']['DB_PASSWORD'])
         db_url = (
-            f"postgresql://{st.secrets['DB_USER']}:{st.secrets['DB_PASSWORD']}"
-            f"@{st.secrets['DB_HOST']}:{st.secrets['DB_PORT']}"
-            f"/{st.secrets['DB_NAME']}"
+            f"postgresql://{st.secrets['db']['DB_USER']}:{password}"
+            f"@{st.secrets['db']['DB_HOST']}:{st.secrets['db']['DB_PORT']}"
+            f"/{st.secrets['db']['DB_NAME']}"
         )
         engine = create_engine(db_url, pool_pre_ping=True)
         return engine
