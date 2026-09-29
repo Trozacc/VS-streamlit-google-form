@@ -315,6 +315,8 @@ def render_section_2():
 
             if success:
                 st.balloons()
+                import time
+                time.sleep(1.5)
                 # Show success message and redirect to home page
                 st.session_state.show_success = True
                 st.session_state.current_section = 1

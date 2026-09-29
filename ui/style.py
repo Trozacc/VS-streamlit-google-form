@@ -82,7 +82,7 @@ def inject_styles():
             LOGO HEADER BACKGROUND (LIGHT GREEN)
             ============================================================ */
         .logo-header-bg {
-            background: #0077B6;
+            background: #2d4a6a;
             margin: -0.75rem calc(50% - 50vw) 0 calc(50% - 50vw);
             padding: 0.5rem 1.5rem;
             display: flex;
@@ -532,36 +532,44 @@ def inject_styles():
             overflow: visible !important;
         }
 
-        /* ============================================================
-           SUMMARY STATS
-           ============================================================ */
+/* ============================================================
+            SUMMARY STATS
+            ============================================================ */
         .stats-row {
             display: flex;
-            gap: 0.6rem;
-            margin: 0.75rem 0 0.5rem 0;
+            gap: 0.8rem;
+            margin: 1rem 0 0.75rem 0;
         }
 
         .stat-card {
             flex: 1;
             background: var(--bg-card);
-            border: 2px solid var(--border-dark);
-            border-radius: var(--radius-sm);
-            padding: 0.5rem 0.6rem;
-            text-align: center;
+            border: 3px solid var(--border-dark);
+            border-radius: var(--radius-md);
+            padding: 0.85rem 1rem;
+            min-width: 120px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .stat-value {
-            font-size: 1.25rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 800;
             line-height: 1.1;
         }
 
         .stat-label {
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-top: 0.2rem;
+            letter-spacing: 0.5px;
+            margin-top: 0.3rem;
+            font-weight: 600;
         }
 
         .stat-present .stat-value { color: #27AE60; }
@@ -693,8 +701,17 @@ def inject_styles():
                 padding: 1.2rem 1.2rem;
             }
 
+            .stat-card {
+                min-width: 100px;
+                padding: 0.75rem 0.85rem;
+            }
+
             .stat-value {
-                font-size: 1.1rem;
+                font-size: 1.3rem;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
             }
         }
 
@@ -732,6 +749,19 @@ def inject_styles():
 
             [data-testid="stSelectbox"] label {
                 font-size: 0.85rem !important;
+            }
+
+            .stat-card {
+                min-width: 85px;
+                padding: 0.6rem 0.7rem;
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .stat-label {
+                font-size: 0.62rem;
             }
 
             .college-header {
@@ -852,6 +882,20 @@ def inject_styles():
                 padding: 0.25rem 0.4rem !important;
                 font-size: 0.7rem !important;
                 min-width: 55px !important;
+            }
+
+            .stat-card {
+                min-width: 75px;
+                padding: 0.55rem 0.6rem;
+                border-width: 2px;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+
+            .stat-label {
+                font-size: 0.58rem;
             }
 
             /* Mobile Landscape (480px and below) */

@@ -11,7 +11,7 @@ def render_header():
     """Display a compact, responsive Vigyan Shaala logo and form title."""
 
     # ── Logo ──────────────────────────────────────────────────
-    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "images.jpg")
+    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cover.jpg")
 
     if os.path.exists(logo_path):
         with open(logo_path, "rb") as f:
