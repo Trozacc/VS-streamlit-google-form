@@ -541,6 +541,102 @@ def inject_styles():
             margin: 1rem 0 0.75rem 0;
         }
 
+        /* ============================================================
+            STICKY FOOTER (Section 2 - Attendance Page)
+            ============================================================ */
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 3rem);
+            max-width: 800px;
+            background: var(--bg-primary);
+            padding: 1rem 0 1.5rem 0;
+            z-index: 100;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+
+        .sticky-footer .stats-row {
+            margin-bottom: 0.75rem;
+            padding: 0 1.5rem;
+        }
+
+        .sticky-footer .stButton > button {
+            width: 100% !important;
+        }
+
+        /* Button row inside footer - matches the two-column button layout */
+        .sticky-footer [data-testid="stHorizontalBlock"] {
+            gap: 1rem !important;
+        }
+
+        .sticky-footer [data-testid="column"] {
+            flex: 1 !important;
+            min-width: 0 !important;
+        }
+
+        /* Add bottom padding to block-container to prevent content hiding behind fixed footer */
+        .block-container {
+            padding-bottom: 12rem !important;
+        }
+
+        /* Tablet Landscape (1024px and below) - Sticky Footer */
+        @media (max-width: 1024px) {
+            .sticky-footer {
+                width: calc(100% - 2rem);
+                padding: 0.85rem 0 1.25rem 0;
+            }
+            .sticky-footer .stats-row {
+                padding: 0 1rem;
+            }
+            .block-container {
+                padding-bottom: 11rem !important;
+            }
+        }
+
+        /* Tablet Portrait (768px and below) - Sticky Footer */
+        @media (max-width: 768px) {
+            .sticky-footer {
+                width: calc(100% - 1.5rem);
+                padding: 0.75rem 0 1rem 0;
+            }
+            .sticky-footer .stats-row {
+                padding: 0 0.75rem;
+            }
+            .block-container {
+                padding-bottom: 10rem !important;
+            }
+        }
+
+        /* Mobile Landscape (480px and below) - Sticky Footer */
+        @media (max-width: 480px) {
+            .sticky-footer {
+                width: calc(100% - 1rem);
+                padding: 0.6rem 0 0.85rem 0;
+            }
+            .sticky-footer .stats-row {
+                padding: 0 0.5rem;
+            }
+            .block-container {
+                padding-bottom: 9rem !important;
+            }
+        }
+
+        /* Error message inside sticky footer - full width with wrapping */
+        .sticky-footer .stAlert {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .sticky-footer .stAlert > div {
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            white-space: normal !important;
+        }
+
         .stat-card {
             flex: 1;
             background: var(--bg-card);
@@ -1097,6 +1193,264 @@ def inject_styles():
                 margin-bottom: 1rem;
             }
         }
+
+        /* ============================================================
+           ADMIN LOGIN & DASHBOARD STYLES
+           ============================================================ */
+
+        /* Admin Login Container */
+        .admin-login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+            padding: 2rem;
+        }
+
+        .admin-login-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-dark);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 3rem;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .admin-login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-login-header h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-login-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Admin Dashboard Header */
+        .admin-dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .admin-dashboard-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .admin-dashboard-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin: 0.25rem 0 0 0;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-dark);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .kpi-value.present { color: #27AE60; }
+        .kpi-value.absent { color: #E74C3C; }
+        .kpi-value.total { color: var(--text-primary); }
+        .kpi-value.percent { color: var(--accent-green); }
+        .kpi-value.records { color: var(--accent-blue); }
+        .kpi-value.days { color: var(--accent-yellow); }
+
+        /* Metric Cards (new st.columns-based layout) */
+        .metric-card {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-green);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 120px;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(105, 171, 74, 0.2);
+            border-color: var(--accent-green-dark);
+        }
+
+        .metric-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--accent-green);
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: var(--bg-card);
+            border: 2px solid var(--border-dark);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filters-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.35rem;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background: var(--bg-card);
+            border: 2px solid var(--border-dark);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Data Tables */
+        .data-table-container {
+            background: var(--bg-card);
+            border: 2px solid var(--border-dark);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .data-table-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Refresh Button */
+        .refresh-button {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Admin Dashboard specific responsive */
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .admin-login-card {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+
+            .filters-row {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
         </style>
         """,
         unsafe_allow_html=True,

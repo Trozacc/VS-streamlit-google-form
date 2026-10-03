@@ -4,25 +4,25 @@ Main Streamlit application — Optimized for One-Page non-scrollable viewport.
 """
 
 import streamlit as st
+from constants import APP_TITLE, PAGE_TITLE, PAGE_ICON
 from ui.style import inject_styles
 from ui.header import render_header
+from ui.admin_dashboard import render_admin_dashboard
+from utils.auth import render_admin_login, is_admin_authenticated
 from db.queries import fetch_session_dates, fetch_colleges, fetch_students_by_college
 from storage.store_to_database import store_attendance
 from utils.helper_functions import validate_attendance
 
 # ─── Page Configuration ───────────────────────────────────────
 st.set_page_config(
-    page_title="Vigyan Shaala — Attendance",
-    page_icon="🔬",
+    page_title=PAGE_TITLE,
+    page_icon=PAGE_ICON,
     layout="centered",
     initial_sidebar_state="collapsed",
 )
 
 # ─── Inject Custom Styles ────────────────────────────────────
 inject_styles()
-
-# ─── Render Header (logo + title) ────────────────────────────
-render_header()
 
 # ─── Session State Initialization ────────────────────────────
 if "current_section" not in st.session_state:
@@ -35,10 +35,32 @@ if "attendance" not in st.session_state:
     st.session_state.attendance = {}
 if "submitted" not in st.session_state:
     st.session_state.submitted = False
+if "show_admin_login" not in st.session_state:
+    st.session_state.show_admin_login = False
+if "admin_authenticated" not in st.session_state:
+    st.session_state.admin_authenticated = False
+if "admin_username" not in st.session_state:
+    st.session_state.admin_username = None
 
 
 # ═══════════════════════════════════════════════════════════════
-# SECTION INDICATOR
+# ROUTER
+# ═══════════════════════════════════════════════════════════════
+
+# Handle admin login modal
+if st.session_state.get("show_admin_login", False):
+    render_header(show_admin_button=True)
+    render_admin_login()
+    st.stop()
+
+# Handle admin dashboard
+if is_admin_authenticated():
+    render_header(show_admin_button=True)
+    render_admin_dashboard()
+    st.stop()
+
+# Regular attendance flow - render header with Team Login button
+render_header(show_admin_button=True)
 # ═══════════════════════════════════════════════════════════════
 def render_section_indicator(active: int):
     """Render the compact step indicator dots."""
@@ -257,6 +279,9 @@ def render_section_2():
             unsafe_allow_html=True,
         )
 
+    # Sticky footer wrapper
+    st.markdown('<div class="sticky-footer">', unsafe_allow_html=True)
+
     st.markdown(
         f"""
         <div class="stats-row">
@@ -290,48 +315,54 @@ def render_section_2():
             st.rerun()
 
     with btn_col2:
-        if st.button("Submit Attendance ✓", key="btn_submit", use_container_width=True, type="primary"):
-            student_names = [s["name"] for s in students]
-            is_valid, error_msg = validate_attendance(st.session_state.attendance, student_names)
+        submit_clicked = st.button("Submit Attendance ✓", key="btn_submit", use_container_width=True, type="primary")
 
-            if not is_valid:
-                st.error(f"⚠️ {error_msg}")
-                st.stop()
+    # Error message (full width, below buttons)
+    if submit_clicked:
+        student_names = [s["name"] for s in students]
+        is_valid, error_msg = validate_attendance(st.session_state.attendance, student_names)
 
-            # Build records
-            records = []
-            for s in students:
-                records.append({
-                    "name": s["name"],
-                    "stream": s.get("stream", "NA"),
-                    "status": st.session_state.attendance[s["name"]],
-                })
+        if not is_valid:
+            st.error(f"⚠️ {error_msg}")
+            st.stop()
 
-            success = store_attendance(
-                session_date=session_date,
-                college=college,
-                attendance_records=records,
-            )
+        # Build records
+        records = []
+        for s in students:
+            records.append({
+                "name": s["name"],
+                "stream": s.get("stream", "NA"),
+                "status": st.session_state.attendance[s["name"]],
+            })
 
-            if success:
-                st.balloons()
-                import time
-                time.sleep(1.5)
-                # Show success message and redirect to home page
-                st.session_state.show_success = True
-                st.session_state.current_section = 1
-                st.session_state.selected_date = None
-                st.session_state.selected_college = None
-                st.session_state.confirmed_date = None
-                st.session_state.confirmed_college = None
-                st.session_state.attendance = {}
-                st.session_state.submitted = False
-                st.rerun()
+        success = store_attendance(
+            session_date=session_date,
+            college=college,
+            attendance_records=records,
+        )
+
+        if success:
+            st.balloons()
+            import time
+            time.sleep(1.5)
+            # Show success message and redirect to home page
+            st.session_state.show_success = True
+            st.session_state.current_section = 1
+            st.session_state.selected_date = None
+            st.session_state.selected_college = None
+            st.session_state.confirmed_date = None
+            st.session_state.confirmed_college = None
+            st.session_state.attendance = {}
+            st.session_state.submitted = False
+            st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ═══════════════════════════════════════════════════════════════
-# ROUTER
+# ROUTER - Regular Attendance Flow
 # ═══════════════════════════════════════════════════════════════
+
 section = st.session_state.current_section
 
 if section == 1:
