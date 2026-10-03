@@ -63,7 +63,7 @@ def render_admin_dashboard():
     # Refresh button
     col_refresh, _ = st.columns([1, 5])
     with col_refresh:
-        if st.button("🔄 Refresh Data", key="refresh_dashboard", use_container_width=True, type="primary"):
+        if st.button("Refresh Data", key="refresh_dashboard", use_container_width=True, type="primary"):
             st.cache_data.clear()
             st.rerun()
 
@@ -94,11 +94,9 @@ def render_admin_dashboard():
     colleges = fetch_available_colleges()
     college_options = ["All"] + colleges
 
-    # Filter columns - Date Range, College, Stream, Student, Status, Clear
-    fcol1, fcol2, fcol3, fcol4, fcol5, fcol6 = st.columns(6)
-
+    # Row 1: Date Range (spans 2 cols), College, Stream
+    fcol1, fcol2, fcol3 = st.columns([2, 1, 1])
     with fcol1:
-        # Date range filter
         st.markdown('<div class="filter-label">Date Range</div>', unsafe_allow_html=True)
         date_range_start = st.date_input("From", value=None, key="filter_date_start", label_visibility="collapsed")
         date_range_end = st.date_input("To", value=None, key="filter_date_end", label_visibility="collapsed")
@@ -106,6 +104,9 @@ def render_admin_dashboard():
         selected_college = st.selectbox("College", college_options, key="filter_college")
     with fcol3:
         selected_stream = st.selectbox("Stream / Batch", stream_options, key="filter_stream")
+
+    # Row 2: Student, Status, Clear Filters button
+    fcol4, fcol5, fcol6 = st.columns([2, 1, 1])
     with fcol4:
         selected_student = st.selectbox("Student", student_options, key="filter_student")
     with fcol5:
@@ -134,7 +135,8 @@ def render_admin_dashboard():
     )
 
     # ── KPI Cards ──────────────────────────────────────────────
-    kpis = calculate_kpis(filtered_data)
+    college_for_kpi = selected_college if selected_college != "All" else None
+    kpis = calculate_kpis(filtered_data, college_filter=college_for_kpi)
 
     # Row 1: 4 cards
     col1, col2, col3, col4 = st.columns(4)

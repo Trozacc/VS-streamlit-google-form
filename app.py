@@ -196,14 +196,22 @@ def render_section_2():
                 st.session_state[f"radio_{safe_name}"] = "Absent"
             st.rerun()
 
-    # ── Table Column Headers ──────────────────────────────────
+    # Shared column ratios for attendance table (header + data rows)
+    # Ratios: # (0.15), Name (1.2), Stream (0.9), Status (1.0)
+    COL_RATIOS = [0.15, 1.2, 0.9, 1.0]
+
+    # Build CSS grid template from ratios for perfect alignment
+    # Convert ratios to fr units (sum = 3.25)
+    grid_template = " ".join([f"{r/3.25:.4f}fr" for r in COL_RATIOS])
+
+    # ── Table Column Headers (single styled HTML block) ──────────
     st.markdown(
-        """
-        <div class="attendance-header-bar">
-            <div>#</div>
-            <div style="text-align:left; padding-right: 4rem;">Student Name</div>
-            <div style="text-align:center; padding-right: 4rem;">Stream</div>
-            <div style="text-align:left; padding-left: 1rem;">Status</div>
+        f"""
+        <div class="attendance-header-bar" style="grid-template-columns: {grid_template};">
+            <div class="attendance-header-cell">#</div>
+            <div class="attendance-header-cell">Student Name</div>
+            <div class="attendance-header-cell">Stream</div>
+            <div class="attendance-header-cell">Status</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -215,9 +223,8 @@ def render_section_2():
             name = student["name"]
             stream = student.get("stream", "—")
 
-            # Use columns with fixed pixel-like ratios for consistent spacing
-            # Ratios: # (0.15), Name (1.2), Stream (0.9), Status (1.0)
-            col_num, col_name, col_stream, col_status = st.columns([0.15, 1.2, 0.9, 1.0])
+            # Use same column ratios as header
+            col_num, col_name, col_stream, col_status = st.columns(COL_RATIOS)
 
             with col_num:
                 st.markdown(

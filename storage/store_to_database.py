@@ -5,7 +5,7 @@ Storage module — writes attendance records to PostgreSQL.
 import streamlit as st
 from datetime import datetime
 from db.connection import get_engine
-from db.queries import _ensure_attendance_schema, ATTENDANCE_TABLE
+from db.queries import _ensure_attendance_schema, ATTENDANCE_TABLE, upsert_attendance_record
 from utils.helper_functions import get_ist_timestamp
 
 
@@ -35,10 +35,11 @@ def store_attendance(
     attendance_records: list[dict],
 ) -> bool:
     """
-    Store attendance records to the PostgreSQL database (batch insert).
+    Store attendance records to the PostgreSQL database (batch upsert).
+    Uses ON CONFLICT to prevent duplicates: one record per student per college per date.
     """
     try:
-        # Ensure schema exists (migration)
+        # Ensure schema exists (migration + unique constraint)
         if not _ensure_attendance_schema():
             raise RuntimeError("Database schema not ready")
 
@@ -49,7 +50,7 @@ def store_attendance(
 
         timestamp = get_ist_timestamp()
 
-        # Build all rows for batch insert
+        # Build all rows for batch upsert
         rows = []
         for record in attendance_records:
             student_name = record["name"]
@@ -65,7 +66,7 @@ def store_attendance(
                 "attendence_status": status
             })
 
-        # Batch insert in single transaction
+        # Batch upsert in single transaction (ON CONFLICT DO UPDATE)
         from sqlalchemy import text
         sql = f"""
         INSERT INTO {ATTENDANCE_TABLE} (
@@ -73,6 +74,11 @@ def store_attendance(
         ) VALUES (
             :timestamp, :date_of_live_session, :college_name, :name_of_student, :subject_area_abbrevation, :attendence_status
         )
+        ON CONFLICT ("Date_of_live_secssion", "College_name", "Name_of_student")
+        DO UPDATE SET
+            "Timestamp" = EXCLUDED."Timestamp",
+            "subject_area_abbrevation" = EXCLUDED."subject_area_abbrevation",
+            "attendence_status" = EXCLUDED."attendence_status";
         """
         with engine.begin() as conn:
             conn.execute(text(sql), rows)

@@ -8,13 +8,24 @@ import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from db.connection import get_engine
+from datetime import datetime
+import pytz
 
 
 # Table name - same as used by the attendance form
 ATTENDANCE_TABLE = "public.student_attendence"
+SOURCE_TABLE = 'public."Incubator 13"'
+
+# Timezone for "today" calculations
+IST = pytz.timezone('Asia/Kolkata')
 
 
-@st.cache_data(ttl=60)
+def _get_ist_today() -> str:
+    """Get today's date in Asia/Kolkata timezone as YYYY-MM-DD string."""
+    return datetime.now(IST).strftime("%Y-%m-%d")
+
+
+@st.cache_data(ttl=30)
 def fetch_attendance_data(
     date_filter: str = None,
     date_range_start: str = None,
@@ -85,7 +96,7 @@ def fetch_attendance_data(
         return pd.DataFrame()
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=30)
 def fetch_available_dates() -> list:
     """Fetch distinct dates from attendance table for filter dropdown."""
     engine = get_engine()
@@ -99,7 +110,7 @@ def fetch_available_dates() -> list:
         return []
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=30)
 def fetch_available_streams() -> list:
     """Fetch distinct streams/batches from attendance table."""
     engine = get_engine()
@@ -113,7 +124,7 @@ def fetch_available_streams() -> list:
         return []
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=30)
 def fetch_available_students() -> list:
     """Fetch distinct student names from attendance table."""
     engine = get_engine()
@@ -127,7 +138,7 @@ def fetch_available_students() -> list:
         return []
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=30)
 def fetch_available_statuses() -> list:
     """Fetch distinct attendance statuses from attendance table."""
     engine = get_engine()
@@ -141,23 +152,42 @@ def fetch_available_statuses() -> list:
         return []
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=30)
 def fetch_available_colleges() -> list:
-    """Fetch distinct colleges from attendance table."""
+    """Fetch distinct colleges from Incubator 13 (source table) for filter dropdown."""
     engine = get_engine()
     if engine is None:
         return []
     try:
-        query = f'SELECT DISTINCT "College_name" FROM {ATTENDANCE_TABLE} WHERE "College_name" IS NOT NULL ORDER BY "College_name"'
+        query = f'SELECT DISTINCT TRIM(college_name) as college FROM {SOURCE_TABLE} WHERE college_name IS NOT NULL AND TRIM(college_name) <> \'\' ORDER BY college'
         df = pd.read_sql(query, engine)
         return [row[0] for row in df.itertuples(index=False)]
     except SQLAlchemyError:
         return []
 
 
-def calculate_kpis(df: pd.DataFrame) -> dict:
+@st.cache_data(ttl=30)
+def fetch_total_students_by_college(college: str = None) -> int:
+    """Fetch total unique students from Incubator 13 for a given college (or all)."""
+    engine = get_engine()
+    if engine is None:
+        return 0
+    try:
+        if college and college != "All":
+            query = f'SELECT COUNT(DISTINCT TRIM(full_name)) FROM {SOURCE_TABLE} WHERE TRIM(college_name) = %(college)s'
+            df = pd.read_sql(query, engine, params={"college": college})
+        else:
+            query = f'SELECT COUNT(DISTINCT TRIM(full_name)) FROM {SOURCE_TABLE} WHERE full_name IS NOT NULL AND TRIM(full_name) <> \'\''
+            df = pd.read_sql(query, engine)
+        return int(df.iloc[0, 0]) if not df.empty else 0
+    except SQLAlchemyError:
+        return 0
+
+
+def calculate_kpis(df: pd.DataFrame, college_filter: str = None) -> dict:
     """
     Calculate KPI metrics from attendance DataFrame.
+    Uses Asia/Kolkata timezone for "today" calculations.
     """
     if df.empty:
         return {
@@ -169,29 +199,26 @@ def calculate_kpis(df: pd.DataFrame) -> dict:
             "total_days": 0,
         }
 
-    # Total unique students
-    total_students = df["Name_of_student"].nunique()
+    # Total unique students from Incubator 13 (source of truth for roster)
+    total_students = fetch_total_students_by_college(college_filter)
 
-    # Today's date (most recent date in data)
-    today = df["Date_of_live_secssion"].max() if not df.empty else None
+    # Today's date in IST
+    today = _get_ist_today()
 
-    if today is not None:
-        today_df = df[df["Date_of_live_secssion"] == today]
-        present_today = len(today_df[today_df["attendence_status"] == "Present"])
-        absent_today = len(today_df[today_df["attendence_status"] == "Absent"])
-    else:
-        present_today = 0
-        absent_today = 0
+    # Filter for today's records
+    today_df = df[df["Date_of_live_secssion"] == today] if "Date_of_live_secssion" in df.columns else pd.DataFrame()
+    present_today = len(today_df[today_df["attendence_status"] == "Present"]) if not today_df.empty else 0
+    absent_today = len(today_df[today_df["attendence_status"] == "Absent"]) if not today_df.empty else 0
 
-    # Attendance % = Present / Total Students * 100
+    # Attendance % = Present Today / (Present Today + Absent Today) * 100
     total_marked_today = present_today + absent_today
-    attendance_pct = (present_today / total_students * 100) if total_students > 0 else 0.0
+    attendance_pct = (present_today / total_marked_today * 100) if total_marked_today > 0 else 0.0
 
-    # Total attendance records
+    # Total attendance records in filtered data
     total_records = len(df)
 
-    # Total distinct attendance days
-    total_days = df["Date_of_live_secssion"].nunique()
+    # Total distinct attendance days in filtered data
+    total_days = df["Date_of_live_secssion"].nunique() if "Date_of_live_secssion" in df.columns else 0
 
     return {
         "total_students": int(total_students),
@@ -204,12 +231,15 @@ def calculate_kpis(df: pd.DataFrame) -> dict:
 
 
 def get_todays_attendance(df: pd.DataFrame) -> pd.DataFrame:
-    """Get attendance breakdown for today (most recent date)."""
+    """Get attendance breakdown for today (IST)."""
     if df.empty:
         return pd.DataFrame()
 
-    today = df["Date_of_live_secssion"].max()
+    today = _get_ist_today()
     today_df = df[df["Date_of_live_secssion"] == today].copy()
+
+    if today_df.empty:
+        return pd.DataFrame()
 
     status_counts = today_df["attendence_status"].value_counts().reset_index()
     status_counts.columns = ["Status", "Count"]

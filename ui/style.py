@@ -70,7 +70,7 @@ def inject_styles():
             visibility: hidden !important;
         }
 
-        .block-container {
+.block-container {
             max-width: 800px !important;
             padding-top: 0.75rem !important;
             padding-bottom: 4rem !important;
@@ -78,9 +78,69 @@ def inject_styles():
             padding-right: 1.5rem !important;
         }
 
+        /* ============================================================
+           HIDE STREAMLIT HEADING ANCHORS (app-wide)
+           ============================================================ */
+        /* Hide the link icon that appears on heading hover */
+        h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+            display: none !important;
+        }
+        /* Hide the header action elements (anchor link buttons) */
+        [data-testid="stHeaderActionElements"] {
+            display: none !important;
+        }
+        /* Hide markdown heading anchors */
+        .markdown-text-container h1 a,
+        .markdown-text-container h2 a,
+        .markdown-text-container h3 a,
+        .markdown-text-container h4 a,
+        .markdown-text-container h5 a,
+        .markdown-text-container h6 a {
+            display: none !important;
+        }
+
 /* ============================================================
-            LOGO HEADER BACKGROUND (LIGHT GREEN)
-            ============================================================ */
+           ADMIN DASHBOARD TITLE CENTERING
+           ============================================================ */
+        .admin-dashboard-header {
+            text-align: center !important;
+        }
+        .admin-dashboard-header > div {
+            display: inline-block !important;
+            text-align: center !important;
+        }
+        .admin-dashboard-title {
+            text-align: center !important;
+            width: 100% !important;
+        }
+        .admin-dashboard-subtitle {
+            text-align: center !important;
+            width: 100% !important;
+        }
+
+        /* ============================================================
+           HEADER COLUMN LAYOUT - Button in right column
+           ============================================================ */
+        /* Right column button styling */
+        [data-testid="column"]:last-child .stButton > button {
+            width: auto !important;
+            min-width: 140px;
+            max-width: 180px;
+            white-space: nowrap;
+        }
+
+        /* On mobile: shrink button */
+        @media (max-width: 768px) {
+            [data-testid="column"]:last-child .stButton > button {
+                min-width: 120px;
+                padding: 0.4rem 0.8rem !important;
+                font-size: 0.8rem !important;
+            }
+        }
+
+        /* ============================================================
+           LOGO HEADER BACKGROUND (LIGHT GREEN)
+           ============================================================ */
         .logo-header-bg {
             background: #2d4a6a;
             margin: -0.75rem calc(50% - 50vw) 0 calc(50% - 50vw);
@@ -301,26 +361,34 @@ def inject_styles():
         }
 
 /* ============================================================
-           ATTENDANCE GRID HEADER
+           ATTENDANCE GRID HEADER (CSS Grid - matches st.columns)
            ============================================================ */
         .attendance-header-bar {
             background: linear-gradient(135deg, #E8F5E8, #F0F7F0);
-            padding: 0.6rem 0.9rem;
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
             border: 2px solid var(--border-dark);
             border-bottom: none;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
             display: grid;
-            grid-template-columns: 50px minmax(220px, 1.2fr) minmax(280px, 0.9fr) minmax(180px, 1fr);
             gap: 0.5rem;
+            padding: 0.75rem 0.9rem;
             font-weight: 600;
             font-size: 0.78rem;
             color: var(--accent-teal);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            align-items: center;
+            margin-bottom: -1px; /* seamless join with roster box */
+        }
+
+        .attendance-header-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
 
         /* ============================================================
-           STUDENT ROWS
+           STUDENT ROWS (matching st.columns layout)
            ============================================================ */
         [data-testid="stVerticalBlockBorderWrapper"] {
             border-color: var(--border-dark) !important;
@@ -329,10 +397,9 @@ def inject_styles():
             background: var(--bg-card) !important;
         }
 
-        /* Ensure columns in rows align with header grid */
+        /* Ensure columns in rows align with header - use same flex layout */
         [data-testid="stVerticalBlockBorderWrapper"] > div:has([data-testid="column"]) {
-            display: grid !important;
-            grid-template-columns: 50px minmax(220px, 1.2fr) minmax(280px, 0.9fr) minmax(180px, 1fr) !important;
+            display: flex !important;
             gap: 0.5rem !important;
             align-items: center !important;
             padding: 0.5rem 0.9rem !important;
@@ -367,7 +434,7 @@ def inject_styles():
             padding-left: 0.5rem;
         }
 
-        .col-stream {
+        .student-stream {
             color: var(--text-secondary);
             font-size: 0.8rem;
             white-space: normal;
@@ -1379,6 +1446,36 @@ def inject_styles():
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 0.35rem;
+        }
+
+        /* Make Streamlit columns in filters wrap responsively */
+        .filters-section [data-testid="column"] {
+            min-width: 180px;
+            flex: 1 1 180px !important;
+        }
+
+        .filters-section .stSelectbox,
+        .filters-section .stDateInput {
+            width: 100% !important;
+        }
+
+        .filters-section .stSelectbox > div > div,
+        .filters-section .stDateInput > div > div {
+            width: 100% !important;
+        }
+
+        /* Ensure dropdown menus are fully visible */
+        .filters-section .stSelectbox [data-baseweb="select"],
+        .filters-section .stDateInput [data-baseweb="input"] {
+            min-width: 100% !important;
+        }
+
+        /* On mobile: stack filters vertically */
+        @media (max-width: 768px) {
+            .filters-section [data-testid="column"] {
+                min-width: 100% !important;
+                flex: 1 1 100% !important;
+            }
         }
 
         /* Chart Containers */

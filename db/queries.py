@@ -16,7 +16,7 @@ ATTENDANCE_TABLE = "public.student_attendence"
 
 
 def _ensure_attendance_schema() -> bool:
-    """Ensure the attendance table exists with correct schema."""
+    """Ensure the attendance table exists with correct schema and unique constraint."""
     engine = get_engine()
     if engine is None:
         return False
@@ -32,6 +32,18 @@ def _ensure_attendance_schema() -> bool:
                     "subject_area_abbrevation" VARCHAR(100),
                     "attendence_status" VARCHAR(10)
                 );
+            """))
+            # Add unique constraint to prevent duplicates (one record per student per college per date)
+            # Use DO block to handle "already exists" gracefully
+            conn.execute(text(f"""
+                DO $$
+                BEGIN
+                    ALTER TABLE {ATTENDANCE_TABLE}
+                    ADD CONSTRAINT uq_student_college_date 
+                    UNIQUE ("Date_of_live_secssion", "College_name", "Name_of_student");
+                EXCEPTION WHEN duplicate_table THEN
+                    -- Constraint already exists, ignore
+                END $$;
             """))
             # Create indexes
             conn.execute(text(f"""
@@ -98,7 +110,7 @@ def fetch_students_by_college(college: str) -> list[dict[str, str]]:
     try:
         query = f"""
             SELECT DISTINCT TRIM(full_name) as full_name, 
-                   COALESCE(NULLIF(TRIM(subject_area_abbreviation), ''), 'NA') as stream
+                   COALESCE(NULLIF(TRIM(abbreviation), ''), 'NA') as stream
             FROM {SOURCE_TABLE}
             WHERE TRIM(college_name) = %(college)s
               AND TRIM(full_name) <> ''
@@ -142,3 +154,44 @@ def insert_attendance_record(
     }
     with engine.begin() as conn:
         conn.execute(text(sql), params)
+
+
+def upsert_attendance_record(
+    timestamp: str,
+    date_of_live_session: str,
+    college_name: str,
+    name_of_student: str,
+    subject_area_abbrevation: str,
+    attendence_status: str
+) -> bool:
+    """
+    Insert or update attendance record (ON CONFLICT DO UPDATE).
+    Returns True if inserted new, False if updated existing.
+    """
+    engine = get_engine()
+    if engine is None:
+        raise RuntimeError("Database engine not available")
+    
+    sql = f"""
+    INSERT INTO {ATTENDANCE_TABLE} (
+        "Timestamp", "Date_of_live_secssion", "College_name", "Name_of_student", "subject_area_abbrevation", "attendence_status"
+    ) VALUES (
+        :timestamp, :date_of_live_session, :college_name, :name_of_student, :subject_area_abbrevation, :attendence_status
+    )
+    ON CONFLICT ("Date_of_live_secssion", "College_name", "Name_of_student")
+    DO UPDATE SET
+        "Timestamp" = EXCLUDED."Timestamp",
+        "subject_area_abbrevation" = EXCLUDED."subject_area_abbrevation",
+        "attendence_status" = EXCLUDED."attendence_status";
+    """
+    params = {
+        "timestamp": timestamp,
+        "date_of_live_session": date_of_live_session,
+        "college_name": college_name,
+        "name_of_student": name_of_student,
+        "subject_area_abbrevation": subject_area_abbrevation,
+        "attendence_status": attendence_status
+    }
+    with engine.begin() as conn:
+        conn.execute(text(sql), params)
+    return True

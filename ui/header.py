@@ -11,22 +11,20 @@ from utils.auth import is_admin_authenticated, render_admin_logout_button
 
 def render_header(show_admin_button: bool = True):
     """Display a compact, responsive Vigyan Shaala logo and form title."""
-
-    # ── Top bar with logo/title on left, admin button on right ────
-    if show_admin_button:
-        col_left, col_right = st.columns([5, 1])
-
-        with col_left:
-            _render_logo_and_title()
-
-        with col_right:
-            _render_admin_button_area()
-    else:
+    
+    # ── 3-column layout: [spacer, centered content, button] ────
+    col_spacer, col_center, col_button = st.columns([1, 2, 1])
+    
+    with col_center:
         _render_logo_and_title()
+    
+    with col_button:
+        if show_admin_button:
+            _render_admin_button_area()
 
 
 def _render_logo_and_title():
-    """Render logo and title (left side of header)."""
+    """Render logo and title (centered)."""
     # ── Logo ──────────────────────────────────────────────────
     logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cover.jpg")
 
@@ -60,14 +58,12 @@ def _render_logo_and_title():
 
 
 def _render_admin_button_area():
-    """Render admin login/logout button (right side of header)."""
+    """Render admin login/logout button (right-aligned in column)."""
     if is_admin_authenticated():
-        # Show logout button when authenticated
         render_admin_logout_button()
     else:
-        # Show login button when not authenticated
-        st.markdown("<div style='margin-top: 1.5rem;'>", unsafe_allow_html=True)
-        if st.button("👥 Team Login", key="team_login_btn", use_container_width=True, type="secondary"):
+        st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
+        if st.button("👥 Team Login", key="team_login_btn", type="secondary"):
             st.session_state.show_admin_login = True
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
