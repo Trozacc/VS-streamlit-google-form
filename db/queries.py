@@ -7,12 +7,13 @@ import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from db.connection import get_engine
-from data.placeholder_data import SESSION_DATES
+from datetime import datetime
 
 
 # Table name - use the existing typo table name
 SOURCE_TABLE = 'public."Incubator 13"'
 ATTENDANCE_TABLE = "public.student_attendence"
+SESSION_TABLE = 'public."Inc13_Session_names.xlsx - Sheet1"'
 
 
 def _ensure_attendance_schema() -> bool:
@@ -65,20 +66,30 @@ def _ensure_attendance_schema() -> bool:
 
 @st.cache_data(ttl=300)
 def fetch_session_dates() -> list[str]:
-    """Return available live session dates from attendance table."""
+    """Return available live session dates from session table."""
     engine = get_engine()
     if engine is None:
-        return SESSION_DATES
+        return []
     try:
-        _ensure_attendance_schema()
         with engine.connect() as conn:
-            result = conn.execute(text(f"SELECT DISTINCT \"Date_of_live_secssion\" FROM {ATTENDANCE_TABLE} ORDER BY \"Date_of_live_secssion\""))
-            dates = [row[0].strftime("%d %B, %Y") if row[0] else "" for row in result]
-            if not dates:
-                return SESSION_DATES
+            # Parse dates from session table (format: "DD-Mon" -> "DD Month, YYYY")
+            result = conn.execute(text(f'SELECT DISTINCT "Date" FROM {SESSION_TABLE} ORDER BY "Date"'))
+            dates = []
+            for row in result:
+                date_str = row[0]
+                if date_str:
+                    try:
+                        # Parse "DD-Mon" format (e.g., "10-Sep")
+                        dt = datetime.strptime(date_str, "%d-%b")
+                        # Use current year
+                        dt = dt.replace(year=datetime.now().year)
+                        dates.append(dt.strftime("%d %B, %Y"))
+                    except ValueError:
+                        # Skip invalid dates
+                        continue
             return dates
     except SQLAlchemyError:
-        return SESSION_DATES
+        return []
 
 
 @st.cache_data(ttl=300)

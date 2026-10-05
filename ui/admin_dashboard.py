@@ -21,6 +21,7 @@ from db.admin_queries import (
     get_college_analysis,
     get_student_overview,
     get_students_needing_attention,
+    get_colleges_needing_attention,
     get_recent_records,
 )
 from utils.auth import is_admin_authenticated, get_admin_username
@@ -78,6 +79,14 @@ def render_admin_dashboard():
     st.markdown('<div class="filters-section">', unsafe_allow_html=True)
     st.markdown('<div class="filters-title">🔍 Filters</div>', unsafe_allow_html=True)
 
+    def reset_filters():
+        st.session_state.filter_date_start = None
+        st.session_state.filter_date_end = None
+        st.session_state.filter_college = "All"
+        st.session_state.filter_stream = "All"
+        st.session_state.filter_student = "All"
+        st.session_state.filter_status = "All"
+
     # Get filter options
     dates = fetch_available_dates()
     date_options = ["All"] + [d.strftime("%Y-%m-%d") if hasattr(d, 'strftime') else str(d) for d in dates]
@@ -94,33 +103,31 @@ def render_admin_dashboard():
     colleges = fetch_available_colleges()
     college_options = ["All"] + colleges
 
-    # Row 1: Date Range (spans 2 cols), College, Stream
-    fcol1, fcol2, fcol3 = st.columns([2, 1, 1])
+    # Row 1: College (wide) | Stream / Batch
+    fcol1, fcol2 = st.columns([3, 2])
     with fcol1:
-        st.markdown('<div class="filter-label">Date Range</div>', unsafe_allow_html=True)
-        date_range_start = st.date_input("From", value=None, key="filter_date_start", label_visibility="collapsed")
-        date_range_end = st.date_input("To", value=None, key="filter_date_end", label_visibility="collapsed")
-    with fcol2:
         selected_college = st.selectbox("College", college_options, key="filter_college")
-    with fcol3:
+    with fcol2:
         selected_stream = st.selectbox("Stream / Batch", stream_options, key="filter_stream")
 
-    # Row 2: Student, Status, Clear Filters button
-    fcol4, fcol5, fcol6 = st.columns([2, 1, 1])
+    # Row 2: Date Range - From and To side by side
+    fcol3, fcol4 = st.columns(2)
+    with fcol3:
+        st.markdown('<div class="filter-label">From</div>', unsafe_allow_html=True)
+        date_range_start = st.date_input("From", value=None, key="filter_date_start", label_visibility="collapsed")
     with fcol4:
-        selected_student = st.selectbox("Student", student_options, key="filter_student")
+        st.markdown('<div class="filter-label">To</div>', unsafe_allow_html=True)
+        date_range_end = st.date_input("To", value=None, key="filter_date_end", label_visibility="collapsed")
+
+    # Row 3: Student (wide) | Status | Clear Filters
+    fcol5, fcol6, fcol7 = st.columns([2, 1, 1])
     with fcol5:
-        selected_status = st.selectbox("Status", status_options, key="filter_status")
+        selected_student = st.selectbox("Student", student_options, key="filter_student")
     with fcol6:
+        selected_status = st.selectbox("Status", status_options, key="filter_status")
+    with fcol7:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Clear Filters", key="clear_filters", use_container_width=True):
-            st.session_state.filter_date_start = None
-            st.session_state.filter_date_end = None
-            st.session_state.filter_college = "All"
-            st.session_state.filter_stream = "All"
-            st.session_state.filter_student = "All"
-            st.session_state.filter_status = "All"
-            st.rerun()
+        st.button("Clear Filters", key="clear_filters", use_container_width=True, on_click=reset_filters)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -238,9 +245,10 @@ def render_admin_dashboard():
             barmode="stack",
             xaxis_title="Stream / Batch",
             yaxis_title="Count",
-            margin=dict(t=10, b=0, l=0, r=0),
+            margin=dict(t=10, b=40, l=0, r=0),
             height=350,
             legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5),
+            xaxis=dict(tickangle=0, tickfont=dict(size=12)),
         )
         st.plotly_chart(fig_stream, use_container_width=True)
 
@@ -322,9 +330,9 @@ def render_admin_dashboard():
         st.info("No student data available.")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Students Requiring Attention ───────────────────────────
+    # ── Colleges Requiring Attention ───────────────────────────────
     st.markdown('<div class="data-table-container">', unsafe_allow_html=True)
-    st.markdown('<div class="data-table-title">⚠️ Students Requiring Attention</div>', unsafe_allow_html=True)
+    st.markdown('<div class="data-table-title">⚠️ Colleges Requiring Attention</div>', unsafe_allow_html=True)
 
     # Threshold slider
     threshold = st.slider(
@@ -334,13 +342,13 @@ def render_admin_dashboard():
         value=70,
         step=5,
         key="attention_threshold",
-        help="Show students with attendance below this percentage"
+        help="Show colleges with attendance below this percentage"
     )
 
-    attention_data = get_students_needing_attention(filtered_data, threshold_pct=threshold)
+    attention_data = get_colleges_needing_attention(filtered_data, threshold_pct=threshold)
     if not attention_data.empty:
         st.dataframe(
-            attention_data[["Student Name", "Stream / Batch", "present", "absent", "attendance_pct"]].rename(
+            attention_data[["College", "present", "absent", "attendance_pct"]].rename(
                 columns={"present": "Present", "absent": "Absent", "attendance_pct": "Attendance %"}
             ),
             use_container_width=True,
@@ -355,7 +363,7 @@ def render_admin_dashboard():
             },
         )
     else:
-        st.success(f"✅ All students have attendance ≥ {threshold}%")
+        st.success(f"✅ All colleges have attendance ≥ {threshold}%")
     st.markdown('</div>', unsafe_allow_html=True)
 
     # ── Recent Attendance Records ──────────────────────────────

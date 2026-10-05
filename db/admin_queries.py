@@ -112,12 +112,12 @@ def fetch_available_dates() -> list:
 
 @st.cache_data(ttl=30)
 def fetch_available_streams() -> list:
-    """Fetch distinct streams/batches from attendance table."""
+    """Fetch distinct streams/batches from Incubator 13 table (abbreviation column)."""
     engine = get_engine()
     if engine is None:
         return []
     try:
-        query = f'SELECT DISTINCT "subject_area_abbrevation" FROM {ATTENDANCE_TABLE} WHERE "subject_area_abbrevation" IS NOT NULL ORDER BY "subject_area_abbrevation"'
+        query = f'SELECT DISTINCT TRIM(abbreviation) as stream FROM {SOURCE_TABLE} WHERE abbreviation IS NOT NULL AND TRIM(abbreviation) <> \'\' ORDER BY stream'
         df = pd.read_sql(query, engine)
         return [row[0] for row in df.itertuples(index=False)]
     except SQLAlchemyError:
@@ -263,19 +263,51 @@ def get_attendance_trend(df: pd.DataFrame) -> pd.DataFrame:
     return trend
 
 
+# Stream abbreviation normalization
+_STREAM_ABBREV_MAP = {
+    "Botany, Zoology, Chemistry (BZC)": "BZC",
+    "Mathematics, Physics, Computer Science (MPCs)": "MPCs",
+    "Mathematics, Statistics, Computer Science (MSCs)": "MSCs",
+    "Mathematics, Zoology, Chemistry (MZC)": "MZC",
+    "Mathematics, Zoology, Geology (MZG)": "MZG",
+    "Microbiology, Statistics, Data Science (MSDs)": "MSDs",
+    "Mathematics, Physics, Chemistry (MPC)": "MPC",
+}
+
+def _normalize_stream_abbrev(val: str) -> str:
+    """Extract abbreviation from full stream name or normalize existing abbreviation."""
+    if not val or not isinstance(val, str):
+        return val
+    v = val.strip()
+    # If already a short code (no parentheses, <= 5 chars, mostly uppercase), keep as-is
+    if "(" not in v and ")" not in v and len(v) <= 5 and v.upper() == v:
+        return v
+    # Try to extract code from parentheses: "Name (CODE)" -> "CODE"
+    import re
+    m = re.search(r"\(([A-Z0-9]+)\)", v)
+    if m:
+        return m.group(1).strip()
+    # Fallback to mapping
+    return _STREAM_ABBREV_MAP.get(v, v)
+
+
 def get_stream_analysis(df: pd.DataFrame) -> pd.DataFrame:
-    """Get attendance analysis by stream/batch."""
+    """Get attendance analysis by stream/batch (using abbreviation only)."""
     if df.empty:
         return pd.DataFrame()
 
-    stream_stats = df.groupby("subject_area_abbrevation").agg(
+    # Normalize stream abbreviations
+    df = df.copy()
+    df["_stream_norm"] = df["subject_area_abbrevation"].apply(_normalize_stream_abbrev)
+
+    stream_stats = df.groupby("_stream_norm").agg(
         total=("Name_of_student", "count"),
         present=("attendence_status", lambda x: (x == "Present").sum())
     ).reset_index()
 
     stream_stats["absent"] = stream_stats["total"] - stream_stats["present"]
     stream_stats["attendance_pct"] = (stream_stats["present"] / stream_stats["total"] * 100).round(1)
-    stream_stats = stream_stats.rename(columns={"subject_area_abbrevation": "Stream"})
+    stream_stats = stream_stats.rename(columns={"_stream_norm": "Stream"})
     stream_stats = stream_stats.sort_values("attendance_pct")
 
     return stream_stats
@@ -327,6 +359,16 @@ def get_students_needing_attention(df: pd.DataFrame, threshold_pct: float = 70.0
         return pd.DataFrame()
 
     attention = student_overview[student_overview["attendance_pct"] < threshold_pct].copy()
+    return attention
+
+
+def get_colleges_needing_attention(df: pd.DataFrame, threshold_pct: float = 70.0) -> pd.DataFrame:
+    """Get colleges with attendance below threshold."""
+    college_analysis = get_college_analysis(df)
+    if college_analysis.empty:
+        return pd.DataFrame()
+
+    attention = college_analysis[college_analysis["attendance_pct"] < threshold_pct].copy()
     return attention
 
 

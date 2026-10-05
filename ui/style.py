@@ -119,21 +119,35 @@ def inject_styles():
         }
 
         /* ============================================================
-           HEADER COLUMN LAYOUT - Button in right column
+           HEADER COLUMN LAYOUT - Buttons in right columns
            ============================================================ */
-        /* Right column button styling */
-        [data-testid="column"]:last-child .stButton > button {
-            width: auto !important;
-            min-width: 140px;
-            max-width: 180px;
-            white-space: nowrap;
+        /* Back and Logout buttons in header (3rd and 4th columns) */
+        [data-testid="column"]:nth-child(3) .stButton > button,
+        [data-testid="column"]:nth-child(4) .stButton > button {
+            width: 100% !important;
+            min-width: 90px !important;
+            max-width: none !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.85rem !important;
+            line-height: 1.3 !important;
+            height: auto !important;
         }
 
-        /* On mobile: shrink button */
+        /* Team Login button (4th column when not authenticated) */
+        [data-testid="column"]:nth-child(4) .stButton > button {
+            min-width: 110px !important;
+        }
+
+        /* On mobile: adjust button sizes */
         @media (max-width: 768px) {
-            [data-testid="column"]:last-child .stButton > button {
-                min-width: 120px;
-                padding: 0.4rem 0.8rem !important;
+            [data-testid="column"]:nth-child(3) .stButton > button,
+            [data-testid="column"]:nth-child(4) .stButton > button {
+                min-width: 80px !important;
+                padding: 0.4rem 0.6rem !important;
                 font-size: 0.8rem !important;
             }
         }
@@ -285,10 +299,28 @@ def inject_styles():
 
         [data-testid="stSelectbox"] [data-baseweb="select"] > div:first-child {
             color: var(--text-primary) !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
         }
 
         [data-testid="stSelectbox"] [data-baseweb="select"] [aria-selected="false"] {
             color: var(--text-primary) !important;
+        }
+
+        /* Dropdown menu (popover) - ensure it's wide enough for longest option */
+        [data-testid="stSelectbox"] [data-baseweb="popover"],
+        [data-testid="stSelectbox"] [data-baseweb="menu"] {
+            min-width: 100% !important;
+            max-width: none !important;
+        }
+
+        [data-testid="stSelectbox"] [data-baseweb="menu"] li,
+        [data-testid="stSelectbox"] [data-baseweb="menu"] [role="option"] {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow: visible !important;
         }
 
         /* Radio Buttons (Strict Single-Line Horizontal) */
@@ -378,13 +410,28 @@ def inject_styles():
             letter-spacing: 0.5px;
             align-items: center;
             margin-bottom: -1px; /* seamless join with roster box */
+            scrollbar-gutter: stable; /* reserve scrollbar space to align with data rows */
         }
 
         .attendance-header-cell {
             display: flex;
             align-items: center;
-            justify-content: center;
             height: 100%;
+        }
+
+        /* Column-specific header alignment to match data cells */
+        .attendance-header-cell:nth-child(1) { /* # */
+            justify-content: center;
+        }
+        .attendance-header-cell:nth-child(2) { /* Student Name */
+            justify-content: flex-start;
+            padding-left: 0.5rem; /* match student-name padding */
+        }
+        .attendance-header-cell:nth-child(3) { /* Stream */
+            justify-content: center;
+        }
+        .attendance-header-cell:nth-child(4) { /* Status */
+            justify-content: center;
         }
 
         /* ============================================================
@@ -395,6 +442,7 @@ def inject_styles():
             border-width: 2px !important;
             border-radius: 0 0 var(--radius-sm) var(--radius-sm) !important;
             background: var(--bg-card) !important;
+            scrollbar-gutter: stable; /* reserve scrollbar space to align with header */
         }
 
         /* Ensure columns in rows align with header - use same flex layout */
@@ -437,6 +485,7 @@ def inject_styles():
         .student-stream {
             color: var(--text-secondary);
             font-size: 0.8rem;
+            font-weight: 700;
             white-space: normal;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -465,6 +514,12 @@ def inject_styles():
             white-space: nowrap !important;
             width: 100% !important;
             padding-right: 1rem !important;
+        }
+
+        /* Roster: center the radio group in Status column to match centered header */
+        [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stRadio"] > div,
+        [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stRadio"] [role="radiogroup"] {
+            justify-content: center !important;
         }
 
         /* Hide native radio input, we'll style the label */
@@ -597,6 +652,11 @@ def inject_styles():
         [data-testid="stRadio"] label[data-baseweb="radio"] span {
             white-space: nowrap !important;
             overflow: visible !important;
+        }
+
+        /* Roster-specific: Bold the Present/Absent labels in attendance rows */
+        [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stRadio"] label[data-baseweb="radio"] {
+            font-weight: 700 !important;
         }
 
 /* ============================================================
@@ -1448,6 +1508,17 @@ def inject_styles():
             margin-bottom: 0.35rem;
         }
 
+        /* Stream filter dropdown with scrollbar */
+        .filters-section .stSelectbox [data-baseweb="popover"] {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+        }
+
+        .filters-section .stSelectbox [data-baseweb="menu"] {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+        }
+
         /* Make Streamlit columns in filters wrap responsively */
         .filters-section [data-testid="column"] {
             min-width: 180px;
@@ -1509,6 +1580,15 @@ def inject_styles():
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 1rem;
+        }
+
+        /* Ensure College column in dataframes wraps long names */
+        .data-table-container [data-testid="stDataFrame"] [data-column-name="College"],
+        .data-table-container [data-testid="stDataFrame"] [data-column-name="College"] div {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow: visible !important;
+            min-width: 280px !important;
         }
 
         /* Refresh Button */

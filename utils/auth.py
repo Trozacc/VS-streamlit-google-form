@@ -65,18 +65,6 @@ def render_admin_login() -> bool:
     return False
 
 
-def render_admin_logout_button():
-    """Render logout button in the admin dashboard header."""
-    col1, col2 = st.columns([6, 1])
-    with col2:
-        if st.button("🚪 Logout", key="admin_logout", use_container_width=True, type="secondary"):
-            # Clear admin session state
-            st.session_state.admin_authenticated = False
-            st.session_state.admin_username = None
-            st.session_state.current_section = 1
-            st.rerun()
-
-
 def is_admin_authenticated() -> bool:
     """Check if admin is currently authenticated."""
     return st.session_state.get("admin_authenticated", False)
