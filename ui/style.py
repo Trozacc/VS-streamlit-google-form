@@ -194,6 +194,7 @@ def inject_styles():
         .form-title-container {
             text-align: center;
             margin: 1.5rem 0 0.5rem 0;
+            padding-right: 1.5rem;
         }
 
         .form-title {
