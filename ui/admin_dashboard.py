@@ -242,7 +242,7 @@ def render_admin_dashboard():
             marker_color="#ff0000",
         ))
         fig_stream.update_layout(
-            barmode="stack",
+            barmode="group",
             xaxis_title="Stream / Batch",
             yaxis_title="Count",
             margin=dict(t=10, b=40, l=0, r=0),
@@ -284,7 +284,7 @@ def render_admin_dashboard():
             marker_color="#ff0000",
         ))
         fig_college.update_layout(
-            barmode="stack",
+            barmode="group",
             xaxis_title="College",
             yaxis_title="Count",
             margin=dict(t=10, b=0, l=0, r=0),

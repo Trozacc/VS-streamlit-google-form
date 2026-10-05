@@ -12,24 +12,20 @@ from utils.auth import is_admin_authenticated
 def render_header(show_admin_button: bool = True):
     """Display a compact, responsive Vigyan Shaala logo and form title."""
     
-    # ── 3-column layout: [spacer, centered content, logout/login btn] ────
-    col_spacer, col_center, col_logout = st.columns([1, 2, 0.6])
+    # ── Centered logo and title ────
+    _render_logo_and_title()
     
-    with col_center:
-        _render_logo_and_title()
-    
-    with col_logout:
-        if show_admin_button and is_admin_authenticated():
-            if st.button("🚪 Logout", key="admin_logout_btn", type="secondary", use_container_width=True):
-                st.session_state.admin_authenticated = False
-                st.session_state.admin_username = None
-                st.session_state.current_section = 1
-                st.rerun()
-        elif show_admin_button:
-            # Team Login button when not authenticated
-            if st.button("👥 Team Login", key="team_login_btn", type="secondary", use_container_width=True):
-                st.session_state.show_admin_login = True
-                st.rerun()
+    # Logout/Team Login button - rendered but positioned via CSS (fixed top-right)
+    if show_admin_button and is_admin_authenticated():
+        if st.button("🚪 Logout", key="admin_logout_btn", type="secondary"):
+            st.session_state.admin_authenticated = False
+            st.session_state.admin_username = None
+            st.session_state.current_section = 1
+            st.rerun()
+    elif show_admin_button:
+        if st.button("👥 Team Login", key="team_login_btn", type="secondary"):
+            st.session_state.show_admin_login = True
+            st.rerun()
 
 
 def _render_logo_and_title():

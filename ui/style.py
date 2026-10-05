@@ -119,49 +119,57 @@ def inject_styles():
         }
 
         /* ============================================================
-           HEADER COLUMN LAYOUT - Buttons in right columns
+           HEADER BUTTONS (absolute positioned)
            ============================================================ */
-        /* Back and Logout buttons in header (3rd and 4th columns) */
-        [data-testid="column"]:nth-child(3) .stButton > button,
-        [data-testid="column"]:nth-child(4) .stButton > button {
-            width: 100% !important;
-            min-width: 90px !important;
-            max-width: none !important;
-            white-space: normal !important;
-            word-wrap: break-word !important;
-            overflow: visible !important;
-            text-overflow: clip !important;
+        /* Container for absolute positioning */
+        .header-logout-btn,
+        .header-login-btn {
+            display: none; /* placeholder divs */
+        }
+
+        /* Position logout/login button at top-right of block-container */
+        [data-testid="stAppViewContainer"] .stButton:has(#admin_logout_btn),
+        [data-testid="stAppViewContainer"] .stButton:has(#team_login_btn) {
+            position: fixed !important;
+            top: 1.5rem !important;
+            right: 2rem !important;
+            z-index: 1000 !important;
+        }
+
+        [data-testid="stAppViewContainer"] .stButton:has(#admin_logout_btn) button,
+        [data-testid="stAppViewContainer"] .stButton:has(#team_login_btn) button {
+            min-width: 110px !important;
             padding: 0.5rem 0.75rem !important;
             font-size: 0.85rem !important;
             line-height: 1.3 !important;
             height: auto !important;
+            white-space: nowrap !important;
         }
 
-        /* Team Login button (4th column when not authenticated) */
-        [data-testid="column"]:nth-child(4) .stButton > button {
-            min-width: 110px !important;
-        }
-
-        /* On mobile: adjust button sizes */
         @media (max-width: 768px) {
-            [data-testid="column"]:nth-child(3) .stButton > button,
-            [data-testid="column"]:nth-child(4) .stButton > button {
-                min-width: 80px !important;
+            [data-testid="stAppViewContainer"] .stButton:has(#admin_logout_btn),
+            [data-testid="stAppViewContainer"] .stButton:has(#team_login_btn) {
+                top: 1rem !important;
+                right: 1rem !important;
+            }
+            [data-testid="stAppViewContainer"] .stButton:has(#admin_logout_btn) button,
+            [data-testid="stAppViewContainer"] .stButton:has(#team_login_btn) button {
+                min-width: 90px !important;
                 padding: 0.4rem 0.6rem !important;
                 font-size: 0.8rem !important;
             }
         }
 
-        /* ============================================================
+/* ============================================================
            LOGO HEADER BACKGROUND (LIGHT GREEN)
            ============================================================ */
         .logo-header-bg {
             background: #2d4a6a;
-            margin: -0.75rem calc(50% - 50vw) 0 calc(50% - 50vw);
+            margin: -0.75rem -1.5rem 0 -1.5rem;
             padding: 0.5rem 1.5rem;
             display: flex;
             justify-content: center;
-            width: 100vw;
+            width: calc(100% + 3rem);
         }
 
         /* ============================================================
@@ -194,6 +202,7 @@ def inject_styles():
         .form-title-container {
             text-align: center;
             margin: 1.5rem 0 0.5rem 0;
+            width: 100%;
         }
 
         .form-title {
@@ -205,6 +214,7 @@ def inject_styles():
             padding: 0 !important;
             letter-spacing: -0.3px;
             line-height: 1.25 !important;
+            text-wrap: balance;
         }
 
         .form-subtitle {
@@ -1365,7 +1375,7 @@ def inject_styles():
         /* Admin Dashboard Header */
         .admin-dashboard-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
